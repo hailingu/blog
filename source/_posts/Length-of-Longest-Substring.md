@@ -1,5 +1,5 @@
 ---
-title: Length-of-Longest-Substring
+title: Length of Longest Substring
 date: 2019-07-30 16:56:03
 categories:
     - leetcode
