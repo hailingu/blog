@@ -10,12 +10,12 @@ tags:
     - ml toys
 ---
 
-梯度下降是数学优化里面的一个方法，数学优化的问题被定义成
+梯度下降是数学优化里面的一个方法，数学优化的问题被定义成：
 
 $$
-\begin {split}
-y &= (a + b)^2 \\
-  &= a^2 + b^2 + 2ab\\
-  &= 0
-\end {split}
+\begin{split}
+& \text{minimize } & f_0(x) \\
+& \text{subject to } & f_i(x) \lt b_i,\ i = 1, \cdot \cdot \cdot, m.
+\end{split}
 $$
+
