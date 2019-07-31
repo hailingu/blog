@@ -18,4 +18,26 @@ tags:
 
 这个系列 blog 的所有算法将会借助 Numpy 和 Python 3 来实现。
 
-*脑子中一直有个想法，就是不用 numpy 实现算法，换句话说就是把 numpy 也再做一遍。哎，似乎不现实，有机会再干吧。*
+*脑子中一直有个想法，就是不用 numpy 实现算法，换句话说就是把 numpy 也再做一遍。*
+
+那到底什么是 machine learning？说实话，这个定义和什么是 Artificial Intelligence 一样难给出，不同的人从不同的角度会给出不同的定义。这里贴一个大家普遍接受的定义：
+
+    对于某类任务 T 和性能度量 M ，如果一个计算机程序 P 在 T 上以 M 衡量的性能随着经验 E 而自我完善，那么我们称这个计算机程序从经验 E 中学习。 
+                                                         -- Tom Mitchell, Machine Learning
+
+这种定义，看看就好，能理解更好。
+
+现在大家普遍理解的任务 T 指的就是电影推荐、物体识别、物体分类这样的任务，当然还有高级一点的，如生成图像之类的任务，这些都可以是 T 的范畴，经验 E 常常指代是用于输入到计算机程序 P 中的 T 的历史数据 D，而 M 是用于评价程序 P 在任务 T 上表现的一些指标。
+
+上面的话其实不是 Tom Mitchell 的原话，原话长这样：
+
+    对于某类任务 T 和性能度量 P ，如果一个计算机程序在 T 上以 P 衡量的性能随着经验 E 而自我完善，那么我们称这个计算机程序从经验 E 中学习。 
+                                                         -- Tom Mitchell, Machine Learning
+
+知道了什么是 machine learning，就可以动手写第一个 machine learning 的程序了。
+
+- *T: Task，任务*
+- *D: Data，数据*
+- *P: Program，程序*
+- *M: Measurement，度量指标*
+- *E: Experience，经验*
