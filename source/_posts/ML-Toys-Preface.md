@@ -22,8 +22,8 @@ tags:
 
 那到底什么是 machine learning？说实话，这个定义和什么是 Artificial Intelligence 一样难给出，不同的人从不同的角度会给出不同的定义。这里贴一个大家普遍接受的定义：
 
-    对于某类任务 T 和性能度量 M ，如果一个计算机程序 P 在 T 上以 M 衡量的性能随着经验 E 而自我完善，那么我们称这个计算机程序从经验 E 中学习。 
-                                                         -- Tom Mitchell, Machine Learning
+    Tom Mitchell, Machine Learning：
+        对于某类任务 T 和性能度量 M ，如果一个计算机程序 P 在 T 上以 M 衡量的性能随着经验 E 而自我完善，那么我们称这个计算机程序从经验 E 中学习。 
 
 这种定义，看看就好，能理解更好。
 
@@ -31,8 +31,8 @@ tags:
 
 上面的话其实不是 Tom Mitchell 的原话，原话长这样：
 
-    对于某类任务 T 和性能度量 P ，如果一个计算机程序在 T 上以 P 衡量的性能随着经验 E 而自我完善，那么我们称这个计算机程序从经验 E 中学习。 
-                                                         -- Tom Mitchell, Machine Learning
+    Tom Mitchell, Machine Learning：
+        对于某类任务 T 和性能度量 P ，如果一个计算机程序在 T 上以 P 衡量的性能随着经验 E 而自我完善，那么我们称这个计算机程序从经验 E 中学习。 
 
 知道了什么是 machine learning，就可以动手写第一个 machine learning 的程序了。
 
