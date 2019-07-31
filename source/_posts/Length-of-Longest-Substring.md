@@ -24,6 +24,8 @@ leetcode 的第 3 题，考察数组的数组的遍历、滑动窗口和 hash �
 
 如果不记起始位置，那么在遇到第 2 个 c（Idx[7]） 的时候，就必须从 map 中清理第一 c（Idx[2]） 及其左边的字符，如果不清理的话，遇到第二个 a（Idx[11]）的时候就会出错了，会把最大长度记成 11（Idx[11] - Idx[1] + 1），而正确答案是 9 （Idx[11] - Idx[3] + 1）。
 
+*Idx[x] = x，Idx[] 表示下标。*
+
 如果记了起始位置，令其为 start，那么遇到 Idx[11] 开始计算长度的时候，需要计算的是 Idx[11] - max(start, map.get(s[11])) + 1，而这个时候的 start = 2（为什么？）。那什么时候需要修改 start？，如果遇到的重复字符在 [start, j) 之间的时候，就需要修改 start 的值了，start = map.get(s[j])。
 
 *在第一次做的时候就没有记录起始位置，导致每次需要从 map 中弹出一些数据，降低了效率。*
@@ -43,7 +45,7 @@ leetcode 的第 3 题，考察数组的数组的遍历、滑动窗口和 hash �
 import java.util.HashMap;
 import java.util.Map;
 
-class LengthOfLongestSubstring {
+class Solution {
     public int lengthOfLongestSubstring(String s) {
         int[] map = new int[128];
         
