@@ -3,10 +3,10 @@ title: ML Toys Preface
 date: 2019-07-30 18:41:09
 categories:
     - machine learning
-    - write machine learning algorithm by hands
-    - ml toys
 tags: 
     - machine learning
+    - write machine learning algorithm by hands
+    - ml toys
 ---
 
 17 年年底的时候，组织过了一次公司内部的 machine learning 的学习和分享活动，当时积累下来不少有价值的内容，没有好好整理，趁着这次重整 blog 的机会，把这部分内容整理出来。幸运的是，自 17 年底来， machine learning 并没有再出现像 10 年以后的四五年内的爆发式的发展，所以这部分的内容不会显的特别过时。甚至，现在的 machine learning 有点凉凉的感觉，就如 40 年前一样。
