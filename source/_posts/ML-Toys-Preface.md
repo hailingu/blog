@@ -4,6 +4,7 @@ date: 2019-07-30 18:41:09
 categories:
     - machine learning
     - write machine learning algorithm by hands
+    - ml toys
 tags: 
     - machine learning
 ---
