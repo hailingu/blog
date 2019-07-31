@@ -1,5 +1,5 @@
 ---
-title: Find Median Sorte dArrays
+title: Find Median Sorted Arrays
 date: 2019-07-31 10:33:21
 categories:
     - leetcode
