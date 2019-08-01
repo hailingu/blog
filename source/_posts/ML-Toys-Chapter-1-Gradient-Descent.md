@@ -37,10 +37,10 @@ Gradient Descent，或者叫做梯度下降，就给出了求解 $\mathbf{x}^{\*
 
 $$
 \begin{split}
-& \text{1. 给定一个起始点 } \mathbf{s} \in \mathbf{R}^n \\
-& \text{2. 计算梯度} -\nabla f(\mathbf{s}) \\
-& \text{3. 更新 } \mathbf{s} \text{, } \mathbf{s} =  \mathbf{s}-\nabla f(\mathbf{s}) \cdot \xi \\
-& \text{4. 比较误差 } dist(\mathbf{s}, \mathbf{x}) \lt \varepsilon \text{如果成立，转到步骤 5，否则转到步骤 2} \\
+& \text{1. 给定一个起始点 } & \mathbf{s} \in \mathbf{R}^n \\
+& \text{2. 计算梯度} & -\nabla f(\mathbf{s}) \\
+& \text{3. 更新 } & \mathbf{s} \text{, } \mathbf{s} =  \mathbf{s}-\nabla f(\mathbf{s}) \cdot \xi \\
+& \text{4. 比较误差 } & dist(\mathbf{s}, \mathbf{x}) \lt \varepsilon \text{如果成立，转到步骤 5，否则转到步骤 2} \\
 & \text{5. End} 
 \end{split}
 $$
