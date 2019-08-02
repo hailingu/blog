@@ -34,7 +34,7 @@ leetcode 的第 5 题，考察数组的数组的遍历。
 ### Code 
 
 ```
-public class LongestPalindrome {
+public class Solution {
 
     String longestPalindrome(String s) {
         if (s == null || 0 == s.length()) {
