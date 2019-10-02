@@ -22,32 +22,27 @@ leetcode 的第 1 题，考察数组的数组的遍历和 hash 表的使用。
 - 时间复杂度：O(n)，因为一次遍历。
 - 空间复杂度：O(n)，因为最坏的情况下，即最后两个元素才是最终的答案， hash 表中要存储 n - 1 个元素。
 - 执行结果：
-    - 执行用时 : **3 ms**, 在所有 Java 提交中击败了 **99.05%** 的用户
-    - 内存消耗 : **37.1 MB**, 在所有 Java 提交中击败了 **91.93%** 的用户
+    - 执行用时 : **36ms**, 在所有 Python 提交中击败了 **98.75%** 的用户
+    - 内存消耗 : **13.1 MB**, 在所有 Python 提交中击败了 **12.41%** 的用户
 
 ### Code 
 
 ```
-import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> map = new HashMap<>();
-        int[] ans = new int[2];
-
-        for (int i = 0; i < nums.length; ++i) {
-            if (map.containsKey(nums[i])) {
-                ans[0] = map.get(nums[i]);
-                ans[1] = i;
-                break;
-            } else {
-                map.put(target - nums[i], i);
-            }
-        }
-        return ans;
-    }
-}
+class Solution(object):
+    def twoSum(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        idx = 0
+        d = {}
+        
+        for num in nums:
+            t = target - num
+            if d.get(t) is not None:
+                return [d.get(t), idx]
+            else:
+                d[num] = idx
+            idx = idx + 1
 ```
-
-注: *使用 break 的原因是为了尽可能的保证这个函数只能通过最后一行返回结果。*
