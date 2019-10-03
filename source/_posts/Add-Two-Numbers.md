@@ -60,69 +60,41 @@ leetcode 的第 2 题，考察链表的遍历和简单数学。
 - 时间复杂度：O(n)，因为一次遍历。
 - 空间复杂度：O(1)，额外的存储空间是常量，即 carrier 和一个虚拟的前驱节点。
 - 执行结果：
-    - 执行用时 : **5 ms**, 在所有 Java 提交中击败了 **96.35%** 的用户
-    - 内存消耗 : **47.1 MB**, 在所有 Java 提交中击败了 **73.02%** 的用户
+    - 执行用时 : **52 ms**, 在所有 Python 提交中击败了 **95.67%** 的用户
+    - 内存消耗 : **11.9 MB**, 在所有 Python 提交中击败了 **20.89%** 的用户
 
 ### Code
 
 ```
-/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode(int x) { val = x; }
- * }
- */
+class ListNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.next = None
 
-import java.util.List;
-import java.util.ArrayList;
+class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        dummyHead = ListNode(-1)
+        t1 = l1
+        t2 = l2
+        curr = dummyHead
 
-class Solution {
-    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        ListNode ans = new ListNode(-1);
-        ListNode i1 = l1, i2 = l2, ansIter = ans;
+        carry = 0
+        while t1 is not None or t2 is not None:
+            x = 0 if t1 is None else t1.val
+            y = 0 if t2 is None else t2.val
 
-        int carrier = 0;
-        while (i1 != null && i2 != null) {
-            i1.val = i1.val + i2.val + carrier;
-            carrier = i1.val / 10;
-            i1.val = i1.val % 10;
-            ansIter.next = i1;
-            i1 = i1.next;
-            i2 = i2.next;
-            ansIter = ansIter.next;
-        }
+            tmp = x + y + carry
+            carry = tmp / 10
+            curr.next = ListNode(tmp % 10)
+            curr = curr.next
+
+            if t1 is not None:
+                t1 = t1.next
+            if t2 is not None:
+                t2 = t2.next
         
-        if (i1 == null && i2 != null) {
-            ansIter.next = i2;
-            while (i2 != null && carrier > 0) {
-                i2.val = i2.val + carrier;
-                carrier = i2.val / 10;
-                i2.val = i2.val % 10;
-                ansIter.next = i2;
-                i2 = i2.next;
-                ansIter = ansIter.next;
-            }
-        }
-        
-        if (i1 != null && i2 == null) {
-            ansIter.next = i1;
-            while (i1 != null && carrier > 0) {
-                i1.val = i1.val + carrier;
-                carrier = i1.val / 10;
-                i1.val = i1.val % 10;
-                ansIter.next = i1;
-                i1 = i1.next;
-                ansIter = ansIter.next;  
-            }
-        }
+        if carry != 0:
+            curr.next = ListNode(1)
 
-        if (carrier > 0) {
-            ansIter.next = new ListNode(1);
-        }
-
-        return ans.next;
-    }
-}
+        return dummyHead.next
 ```
