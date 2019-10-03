@@ -92,7 +92,7 @@ class Solution(object):
                 t1 = t1.next
             if t2 is not None:
                 t2 = t2.next
-        
+
         if carry != 0:
             curr.next = ListNode(1)
 
