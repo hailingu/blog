@@ -27,7 +27,7 @@ leetcode 的第 6 题，考察数组的数组的遍历。
 
 第二行元素的下标为，设 l 为行号（此时 l = 1），step1 = step - 2 * l， step2 = step - step1：
 
-    Idx[0 + l], Idx[0 + l + step1], Idx[0 + l + step1 + step2], Idx[0 + l + step + step1],  Idx[0 + l + step1 + step2 + step1 + step2]...
+    Idx[0 + l], Idx[0 + l + step1], Idx[0 + l + step1 + step2], Idx[0 + l + step + step1],  Idx[0 + l + 2*step]...
 
 第三行元素的下标为，（此时 l = 2）：
 
