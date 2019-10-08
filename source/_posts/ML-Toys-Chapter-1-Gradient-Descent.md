@@ -50,10 +50,9 @@ $$
 
 ### Code
 
-由于不同的 loss 对应着不同的计算梯度的方法，其中 dw 和 db 需要根据具体的 loss 求解出来。
+由于不同的 loss 对应着不同的计算梯度的方法，其中 ds 需要根据具体的 loss 求解出来。
 
     ```
-        def gradient_descent(w, b, xi, dw, db):
-            w = w - xi * dw
-            b = b - xi * db
+        def gradient_descent(w, xi, ds):
+            s = s - ds
     ```
