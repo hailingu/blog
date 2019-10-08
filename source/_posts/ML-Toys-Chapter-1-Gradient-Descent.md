@@ -54,5 +54,5 @@ $$
 
     ```
         def gradient_descent(w, xi, ds):
-            s = s - ds
+            s = s - xi * ds
     ```
