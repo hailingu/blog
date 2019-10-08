@@ -21,19 +21,25 @@ leetcode 的第 6 题，考察数组的数组的遍历。
 
 <!-- more -->
 
-简单做一下计算，在给定行数为 n 的情况下，第一行元素的下标分别为，设 q = 2 * n - 2：
+简单做一下计算，在给定行数为 numRows 的情况下，第一行元素的下标分别为，设 step = 2 * numRows - 2：
 
-    0, Idx[0] + 1 * q, Idx[1] + 1 * q, ...
+    Idx[0], Idx[0 + step], Idx[0 + step + step]...
 
-第二行元素的下标为，设 l 为行号，step1 = q - 2 * l， step2 = q - step1：
+第二行元素的下标为，设 l 为行号（此时 l = 1），step1 = step - 2 * l， step2 = step - step1：
 
-    1， Idx[0] + step1, Idx[1] + step2, Idx[2] + step1, ...
+    Idx[0 + l], Idx[0 + l + step1], Idx[0 + l + step1 + step2], Idx[0 + l + step + step1],  Idx[0 + l + step1 + step2 + step1 + step2]...
+
+第三行元素的下标为，（此时 l = 2）：
+
+    Idx[0 + l], Idx[0 + l + step1], Idx[0 + l + step1 + step2], Idx[0 + l + step + step1],  Idx[0 + l + step1 + step2 + step1 + step2]...
 
 直到最后一行：
 
-    n, Idx[0] + q, Idx[1] + 1 * q, ...
+    Idx[0] + n - 1, Idx[1] = Idx[0] + step, Idx[2] = Idx[1] + 1 * step, ...
 
-*Idx[1] = Idx[0] + q 或者 Idx[1] = Idx[0] + step1，希望这个表述能清楚。*
+注意到 step = step1 + step2，即有 0 + l + step1 = 0 + l + step - 2 * l = step - l，所以在第 2 行到 n-2 行的下标可以修改为：
+
+    Idx[0 + l], Idx[0 + step - l], Idx[0 + step], Idx[0 + 2*step - l] ...
 
 有一些特殊情况直接返回字符串即可，即 n = 1 或者 n 大于字符串长度的时候。
 
@@ -42,35 +48,33 @@ leetcode 的第 6 题，考察数组的数组的遍历。
 - 时间复杂度：O(n)，因为一次遍历。
 - 空间复杂度：O(1)，没有额外存储。
 - 执行结果：
-  - 执行用时 : **10 ms**, 在所有 Java 提交中击败了 **95.57%** 的用户
-  - 内存消耗 : **40.4 MB**, 在所有 Java 提交中击败了 **83.84%** 的用户
+  - 执行用时 : **48 ms**, 在所有 Python 提交中击败了 **84.40%** 的用户
+  - 内存消耗 : **11.7 MB**, 在所有 Python 提交中击败了 **46.04%** 的用户
 
 ### Code
 
     ```
-    class Solution {
-        public String convert(String s, int numRows) {
-            if (numRows <= 1 || (s != null && numRows >= s.length())) {
-                return s;
-            }
+    class Solution(object):
+        def convert(self, s, numRows):
+            """
+            :type s: str
+            :type numRows: int
+            :rtype: str
+            """
+            l = len(s)
+            if numRows <= 1 or (numRows >= l):
+                return s
 
-            StringBuilder ans = new StringBuilder();
-            int totalStep = 2 * numRows - 2;
-            int nextStep = 0;
-            for (int i = 0; i < numRows; ++i) {
-                int j = i;
-                nextStep = 2 * i;
-                while (j < s.length()) {
-                    ans.append(s.charAt(j));
-                    if (nextStep == 0 || nextStep == totalStep) {
-                        j += totalStep;
-                    } else {
-                        j += totalStep - nextStep;
-                        nextStep = totalStep - nextStep;
-                    }
-                }
-            }
-            return ans.toString();
-        }
-    }
+            ans = ''
+            step = 2 * numRows - 2
+
+            for i in range(numRows):
+                j = 0
+                while j + i < l:
+                    ans += s[j + i]
+                    if i != 0 and i != numRows - 1 and j + step - i < l:
+                        ans += s[j + step - i]
+
+                    j += step
+            return ans  
     ```
