@@ -8,6 +8,7 @@ tags:
     - list
     - math
     - two pointers
+    - medium
 ---
 
 leetcode 的第 2 题，考察链表的遍历和简单数学。

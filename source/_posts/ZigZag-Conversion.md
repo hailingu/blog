@@ -7,6 +7,7 @@ tags:
     - leetcode
     - array
     - math
+    - medium
 ---
 
 leetcode 的第 6 题，考察数组的数组的遍历。

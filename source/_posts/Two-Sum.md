@@ -7,6 +7,7 @@ tags:
     - leetcode
     - array
     - hash table
+    - easy
 ---
 
 leetcode 的第 1 题，考察数组的数组的遍历和 hash 表的使用。

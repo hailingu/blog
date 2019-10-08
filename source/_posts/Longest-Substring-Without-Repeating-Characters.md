@@ -9,6 +9,7 @@ tags:
     - string
     - two pointers
     - slide window
+    - medium
 ---
 
 leetcode 的第 3 题，考察数组的数组的遍历、滑动窗口和 hash 表。

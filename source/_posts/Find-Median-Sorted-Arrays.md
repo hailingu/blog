@@ -8,6 +8,7 @@ tags:
     - array
     - math
     - two pointers
+    - hard
 ---
 
 leetcode 的第 4 题，考察数组的遍历、双指针、二分查找和一点点数学。

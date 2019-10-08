@@ -10,6 +10,7 @@ tags:
     - hash table
     - palindromic
     - tow pointers
+    - medium
 ---
 
 leetcode 的第 5 题，考察数组的数组的遍历。
