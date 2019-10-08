@@ -60,41 +60,41 @@ leetcode 的第 2 题，考察链表的遍历和简单数学。
 - 时间复杂度：O(n)，因为一次遍历。
 - 空间复杂度：O(1)，额外的存储空间是常量，即 carrier 和一个虚拟的前驱节点。
 - 执行结果：
-    - 执行用时 : **52 ms**, 在所有 Python 提交中击败了 **95.67%** 的用户
-    - 内存消耗 : **11.9 MB**, 在所有 Python 提交中击败了 **20.89%** 的用户
+  - 执行用时 : **52 ms**, 在所有 Python 提交中击败了 **95.67%** 的用户
+  - 内存消耗 : **11.9 MB**, 在所有 Python 提交中击败了 **20.89%** 的用户
 
 ### Code
 
-```
-class ListNode(object):
-    def __init__(self, x):
-        self.val = x
-        self.next = None
+    ```
+    class ListNode(object):
+        def __init__(self, x):
+            self.val = x
+            self.next = None
 
-class Solution(object):
-    def addTwoNumbers(self, l1, l2):
-        dummyHead = ListNode(-1)
-        t1 = l1
-        t2 = l2
-        curr = dummyHead
+    class Solution(object):
+        def addTwoNumbers(self, l1, l2):
+            dummyHead = ListNode(-1)
+            t1 = l1
+            t2 = l2
+            curr = dummyHead
 
-        carry = 0
-        while t1 is not None or t2 is not None:
-            x = 0 if t1 is None else t1.val
-            y = 0 if t2 is None else t2.val
+            carry = 0
+            while t1 is not None or t2 is not None:
+                x = 0 if t1 is None else t1.val
+                y = 0 if t2 is None else t2.val
 
-            tmp = x + y + carry
-            carry = tmp / 10
-            curr.next = ListNode(tmp % 10)
-            curr = curr.next
+                tmp = x + y + carry
+                carry = tmp / 10
+                curr.next = ListNode(tmp % 10)
+                curr = curr.next
 
-            if t1 is not None:
-                t1 = t1.next
-            if t2 is not None:
-                t2 = t2.next
+                if t1 is not None:
+                    t1 = t1.next
+                if t2 is not None:
+                    t2 = t2.next
 
-        if carry != 0:
-            curr.next = ListNode(1)
+            if carry != 0:
+                curr.next = ListNode(1)
 
-        return dummyHead.next
-```
+            return dummyHead.next
+    ```

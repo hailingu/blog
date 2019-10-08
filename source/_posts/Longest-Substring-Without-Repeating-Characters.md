@@ -30,31 +30,30 @@ leetcode 的第 3 题，考察数组的数组的遍历、滑动窗口和 hash �
 
 *在第一次做的时候就没有记录起始位置，导致每次需要从 map 中弹出一些数据，降低了效率。*
 
-
 ### 复杂度分析
 
 - 时间复杂度：O(n)，因为一次遍历。
 - 空间复杂度：O(1)，因为最坏的情况下，整个字符串都是不同字符，但是实际上字符的数量本身是有限的，最大值就是个常量，在本题的测试用例中，字符数不超过 ascii 的范围。
 - 执行结果：
-    - 执行用时 : **40 ms**, 在所有 Python 提交中击败了 **96.64%** 的用户
-    - 内存消耗 : **12 MB**, 在所有 Python 提交中击败了 **50.92%** 的用户
+  - 执行用时 : **40 ms**, 在所有 Python 提交中击败了 **96.64%** 的用户
+  - 内存消耗 : **12 MB**, 在所有 Python 提交中击败了 **50.92%** 的用户
 
-### Code 
+### Code
 
-```
-class Solution(object):
-    def lengthOfLongestSubstring(self, s):
-        """
-        :type s: str
-        :rtype: int
-        """
-        d = {}
-        o, l, i = 0, 0, 0
-        for c in s:
-            if c in d:
-                o = max(o, d[c])
-            l = max(l, i - o + 1)
-            d[c] = i + 1
-            i += 1
-        return l
-```
+    ```
+    class Solution(object):
+        def lengthOfLongestSubstring(self, s):
+            """
+            :type s: str
+            :rtype: int
+            """
+            d = {}
+            o, l, i = 0, 0, 0
+            for c in s:
+                if c in d:
+                    o = max(o, d[c])
+                l = max(l, i - o + 1)
+                d[c] = i + 1
+                i += 1
+            return l
+    ```
