@@ -1,5 +1,5 @@
 ---
-title: String-to-Integer
+title: String to Integer
 date: 2019-10-09 13:59:15
 categories:
     - leetcode
