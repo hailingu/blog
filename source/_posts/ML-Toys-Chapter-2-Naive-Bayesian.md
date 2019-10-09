@@ -29,10 +29,14 @@ P(x_1, x_2, \ldots , x_n | c_k) = P(x_1 | c_k)P(x_2 | c_k) \ldots P(x_n | c_k) =
 \end{split}
 $$
 
-这样结合贝叶斯定理，就可以计算出在给定特征 $x={x_1, x_2, \ldots, x_n}$ 的情况下，就可以计算出这个 $x$ 属于类别 $c_k$ 的概率，即 $P(c_k | x_1, \ldots, x_n)$。
+这样结合贝叶斯定理，就可以计算出在给定特征 $x=(x_1, x_2, \ldots, x_n)$ 的情况下，就可以计算出这个 $x$ 属于类别 $c_k$ 的概率，即 $P(c_k | x_1, \ldots, x_n)$。
 
 $$
 \begin{split}
 P(c_k | x_1, \ldots, x_n) & = & \frac{P(x_1, \ldots, x_n | c_k)P(c_k)}{P(x_1, \ldots, x_n)}
 \end{split}
 $$
+
+仔细观察上面的式子，从数据集中，可以直接统计出 $P(x_1, \ldots, x_n)$、$P(x_1, \ldots, x_n | c_k)$、$P(c_k)$，这样计算出 $P(c_k | x_1, \ldots, x_n)$ 就很容易了。在实际工程中，上述的三个统计变量都存储在一张巨大的表中，所有的值都可以查表得到。
+
+朴素贝叶斯典型的应用在 nlp 的语种分类，垃圾邮件分类，以及其他的一些分类中。
