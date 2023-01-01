@@ -1,5 +1,5 @@
 ---
-title: ML-Toys-Chapter-2-Naive-Bayesian
+title: ML Toys Chapter 2 Naive Bayesian
 date: 2019-10-09 20:19:10
 mathjax: true
 tags: 
