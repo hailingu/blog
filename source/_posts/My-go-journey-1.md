@@ -24,6 +24,7 @@ mkdir go_test_project
 cd go_test_project
 go mod init go_test_project
 ```
+> 设置 GOROOT 环境变量为安装的 Go 的路径。
 
 2. 引入依赖
 
