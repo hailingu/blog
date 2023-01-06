@@ -35,4 +35,26 @@ go get -u github.com/gin-gonic/gin
 
 完成上面两步就实现了 go mod 项目的创建，这个时候就可以在 go_test_project 目录下直接写代码了。
 
+3. 创建第一个程序
 
+```go
+pacakge main
+
+import fmt
+
+func main() {
+    fmt.Println("Hello World!")
+}
+```
+
+4. 编译 main.go
+
+```bash
+go build main.go
+```
+
+5. 运行程序
+
+```bash
+./main
+```
