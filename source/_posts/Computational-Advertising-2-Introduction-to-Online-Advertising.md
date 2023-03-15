@@ -11,6 +11,8 @@ tags:
 
 伴随着智能手机的普及，在线广告已经在我们的生活中无处不在了。当然，如果你仍然使用的是功能机的话，那么在线广告可能对你的影响不会那么大。当我们打开手机的上的应用，第一个画面往往就是一个在线广告。例如我刚刚打开了我的腾讯视频 APP，第一个画面是下面这个样子，显然是一个携程的广告：
 
+<!--more-->
+
 ![open-screen-advertisement](https://github.com/hailingu/hailingu.github.io/blob/master/images/open-screen-advertisement.jpeg)
 
 而且携程广告图片上的地方我去年的时候刚刚去过，大理洱海的网红 S 湾。一般大家把这种打开 APP 第一个画面看到的广告叫做*开屏广告*。**这种在腾讯视频这样的在线媒体上投放的广告，就称之为在线广告**。
