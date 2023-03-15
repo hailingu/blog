@@ -2,10 +2,10 @@
 title: My go journey 1
 date: 2022-11-04 16:48:40
 categories:
-    - go
+  - go
 tags:
-    - go
-    - software engineering
+  - go
+  - software engineering
 ---
 
 ### 安装 Go
@@ -24,11 +24,12 @@ mkdir go_test_project
 cd go_test_project
 go mod init go_test_project
 ```
+
 > 设置 GOROOT 环境变量为安装的 Go 的路径。
 
 2. 引入依赖
 
-> 以 gin 库为例
+> 以 gin 为例
 
 ```bash
 go get -u github.com/gin-gonic/gin
