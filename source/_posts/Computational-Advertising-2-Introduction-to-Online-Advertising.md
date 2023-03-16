@@ -13,7 +13,7 @@ tags:
 
 <!--more-->
 
-![open-screen-advertisement](https://github.com/hailingu/hailingu.github.io/blob/master/images/open-screen-advertisement.jpeg?raw=true)
+![open-screen-advertisement](https://github.com/hailingu/hailingu.github.io/raw/master/images/open-screen-advertisement.jpeg?raw=true)
 
 而且携程广告图片上的地方我去年的时候刚刚去过，大理洱海的网红 S 湾。一般大家把这种打开 APP 第一个画面看到的广告叫做*开屏广告*。**这种在腾讯视频这样的在线媒体上投放的广告，就称之为在线广告**。
 
