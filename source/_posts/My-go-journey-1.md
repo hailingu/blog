@@ -13,6 +13,8 @@ tags:
 1. 下载 [Go](https://go.dev/dl/) 安装包，不同的系统下载对应的安装包。
 2. 直接运行对应的安装包
 
+<!--more-->
+
 ### Go 项目创建
 
 > go mod 模式
@@ -53,6 +55,12 @@ func main() {
 
 ```bash
 go build main.go
+```
+
+如果需要指定编译的目标平台，以 centos 为例：
+
+```bash
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/main
 ```
 
 5. 运行程序
