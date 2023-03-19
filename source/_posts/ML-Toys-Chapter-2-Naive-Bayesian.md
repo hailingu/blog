@@ -2,19 +2,17 @@
 title: ML Toys Chapter 2 Naive Bayesian
 date: 2019-10-09 20:19:10
 mathjax: true
-tags: 
-    - machine learning
-    - nlp
-    - naive bayesian
-    - write machine learning algorithm by hands
-    - ml toys
+tags:
+  - machine learning
+  - nlp
+  - naive bayesian
+  - write machine learning algorithm by hands
+  - ml toys
 ---
 
 ### 所谓理论
 
 朴素贝叶斯基于一个定理，和一个假设。定理即贝叶斯定理，假设呢就是各个特征条件独立，这个假设也是朴素贝叶斯名字里含有“朴素”俩字的原因。回顾一下贝叶斯定理：
-
-<!-- more -->
 
 $$
 \begin{split}
@@ -22,6 +20,8 @@ $$
 & \text{subject to } P(b) \neq 0
 \end{split}
 $$
+
+<!-- more -->
 
 另一个特征的条件独立，意味着下面的式子成立：
 
@@ -35,7 +35,7 @@ $$
 
 $$
 \begin{split}
-P(c_k | x_1, \ldots, x_n) & = & \frac{P(x_1, \ldots, x_n | c_k)P(c_k)}{P(x_1, \ldots, x_n)}
+P(c_k | x_1, \ldots, x_n) = & \frac{P(x_1, \ldots, x_n | c_k)P(c_k)}{P(x_1, \ldots, x_n)}
 \end{split}
 $$
 
