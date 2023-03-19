@@ -148,9 +148,6 @@ for i in range(0, 26):
 23 mbizdyqbkzri
 24 ncjaezrclasj
 25 odkbfasdmbtk
-
-Process finished with exit code 0
-
 ```
 
 可以看到 **13 cryptography**，这个就是我们想要的结果，加密密钥即为平移 13 位。
