@@ -1,7 +1,7 @@
 ---
 title: Cipher 2
 date: 2023-03-19 10:06:14
-tags: Cipher
+tags: cipher
 mathjax: true
 ---
 
