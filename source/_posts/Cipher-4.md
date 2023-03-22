@@ -59,7 +59,7 @@ CFB 模式的解密和之前的 DES、AES 稍有不同，也非常类似。比�
 ### OFB 模式
 
 1. 初始化向量 V
-2. 加密向量 V 得到 $ Enc(V) $
+2. 加密向量 V 得到 $Enc(V) $
 3. 明文分组 1 与向量 $Enc(V)$ 执行操作，$m_1 \bigoplus Enc(V)$，得到 $m_1Enc(V)$
 4. 将 $Enc(V)$ 加密得到 $Enc(Enc(V))$
 5. 明文分组 2 与 $Enc(Enc(V))$ 执行操作，$m_2 \bigoplus Enc(Enc(V))$，得到 $m_2Enc(Enc(V))$
