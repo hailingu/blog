@@ -34,7 +34,7 @@ tags: cipher
 
 1. 初始化向量 V
 2. 明文分组 1 与向量 V 执行操作，$m_1 \bigoplus V$，得到 $m_1V$，对其加密得到 $Enc(m_1V)$
-3. 明文分组 2 与 $Enc(m_1V)$ 执行操作，$ m_2 \bigoplus Enc(m_1V)$，得到 $m_2V$，对其加密得到 $Enc(m_2V)$
+3. 明文分组 2 与 $Enc(m_1V)$ 执行操作，$m_2 \bigoplus Enc(m_1V)$，得到 $m_2V$，对其加密得到 $Enc(m_2V)$
 4. 重复步骤 2、3 直到全部明文加密
 
 解密的过程就是反过来操作，和前面提过的 DES、AES 的解密方式一模一样，这个方案的弱点在于数据不能丢失，如果最终的数据在传输过程中错了 1 比特位或者丢失了 1 比特位，会导致出错的比特位之前的密文分组无法解密。
@@ -49,7 +49,7 @@ CTS 模式：该模式是在 CBC 模式下，如果最后一个明文分组不�
 2. 加密向量 V 得到 $Enc(V)$
 3. 明文分组 1 与向量 $Enc(V)$ 执行操作，$m_1 \bigoplus Enc(V)$，得到 $m_1Enc(V)$
 4. 将 $m_1Enc(V)$ 加密得到 $Enc(m_1Enc(V))$
-5. 明文分组 2 与 $Enc(m_1Enc(V))$ 执行操作，$ m_2 \bigoplus Enc(m_1Enc(V))$，得到 $m_2Enc(m_1Enc(V))$
+5. 明文分组 2 与 $Enc(m_1Enc(V))$ 执行操作，$m_2 \bigoplus Enc(m_1Enc(V))$，得到 $m_2Enc(m_1Enc(V))$
 6. 重复步骤 2、3、4、5 直到全部明文分组加密
 
 CFB 模式的解密和之前的 DES、AES 稍有不同，也非常类似。比如要解密最后一个分组 $N$，那么需要加密分组 $N-1$，将加密结果与密文分组 N 做 xor 操作即可得到明文。
@@ -59,10 +59,10 @@ CFB 模式的解密和之前的 DES、AES 稍有不同，也非常类似。比�
 ### OFB 模式
 
 1. 初始化向量 V
-2. 加密向量 V 得到 $Enc(V)$
+2. 加密向量 V 得到 $ Enc(V) $
 3. 明文分组 1 与向量 $Enc(V)$ 执行操作，$m_1 \bigoplus Enc(V)$，得到 $m_1Enc(V)$
 4. 将 $Enc(V)$ 加密得到 $Enc(Enc(V))$
-5. 明文分组 2 与 $Enc(Enc(V))$ 执行操作，$ m_2 \bigoplus Enc(Enc(V))$，得到 $m_2Enc(Enc(V))$
+5. 明文分组 2 与 $Enc(Enc(V))$ 执行操作，$m_2 \bigoplus Enc(Enc(V))$，得到 $m_2Enc(Enc(V))$
 6. 将 $Enc(Enc(V))$ 加密得到 $Enc(Enc(Enc(V)))$
 7. 重复步骤 3、4、5、6 直到全部明文分组加密
 
