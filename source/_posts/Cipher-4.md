@@ -2,6 +2,7 @@
 title: Cipher 4
 date: 2023-03-22 21:08:27
 tags: cipher
+mathjax: true
 ---
 
 ### 分组密码模式
