@@ -1,13 +1,11 @@
 ---
-title: Linux Memory Addressing
+title: Linux Memory Addressing - I
 date: 2023-09-11 20:19:16
 tags:
   - linux
   - memory
   - addressing
 ---
-
-# Linux Memory Addressing - I
 
 在 Linux 中，ELF 典型的文件构成如下图所示
 
