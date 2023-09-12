@@ -9,7 +9,7 @@ tags:
 
 在 Linux 中，ELF 典型的文件构成如下图所示
 
-![lma-2](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-2.png?raw=true)
+![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-2.png?raw=true)
 
 ELF 文件被分成了多个段，每个段由**逻辑地址**组成。
 
@@ -23,7 +23,7 @@ ELF 文件被分成了多个段，每个段由**逻辑地址**组成。
 
 <!--more-->
 
-![lma-1](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-1.png?raw=true)
+![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-1.png?raw=true)
 
 程序里的逻辑地址，经过**Memory Management Unit(MMU)** 的硬件电路 **Segmentation Unit** 的处理，得到 **线性地址**。**线性地址** 由 **Paging Unit** 处理得到 **物理地址** 。CPU 拿到 **物理地址** 后，往内存地址总线上发送内存访问单元的物理地址信号，并由内存仲裁器决定，CPU 是否能立刻访问对应的内存地址。
 
