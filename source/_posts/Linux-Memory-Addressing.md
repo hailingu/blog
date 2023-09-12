@@ -7,8 +7,6 @@ tags:
   - addressing
 ---
 
-# Linux Memory Addressing - I
-
 在 Linux 中，ELF 典型的文件构成如下图所示
 
 ![lma-2](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-2.png?raw=true)
