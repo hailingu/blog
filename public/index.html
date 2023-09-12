@@ -176,7 +176,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-12 09:55:45" itemprop="dateModified" datetime="2023-09-12T09:55:45+08:00">2023-09-12</time>
+                <time title="Modified: 2023-09-13 02:26:07" itemprop="dateModified" datetime="2023-09-13T02:26:07+08:00">2023-09-13</time>
               </span>
 
           
@@ -190,10 +190,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>在 Linux 中，ELF 典型的文件构成如下图所示</p>
-<p><img
-src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-2.png?raw=true" /></p>
-<p>ELF 文件被分成了多个段，每个段由<strong>逻辑地址</strong>组成。</p>
+          <p>在 Linux 中，程序经过编译后会生成 object
+file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load
+阶段会通过系统调用创建<strong>逻辑地址空间</strong>，读取 link 后的 elf
+文件加载到内存里，并设置其运行的地址空间为对应的<strong>逻辑地址空间</strong>。CPU
+运行加载在内存中的程序，读取指令，生成 <strong>逻辑地址</strong>
+（或者叫做虚拟地址）。</p>
 <p>在 x86 中需要区分 3 种地址：</p>
 <ul>
 <li>逻辑地址：一个逻辑地址的内容表示一个操作数或者指令，逻辑地址本身由<strong>段选择符</strong>和<strong>段内偏移量</strong>组成。比如下图的指令

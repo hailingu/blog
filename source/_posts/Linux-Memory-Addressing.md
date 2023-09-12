@@ -25,20 +25,27 @@ tags:
 
 ## 段选择器和段寄存器
 
-一个逻辑地址由段标识符和偏移量组成：
+一个逻辑地址由段标识符和偏移量组成
 
 1. 段标识符：长度为 16bit，又被称为段选择器
 2. 偏移量：长度为 32bit
 
-段选择器，如下图所示，
+段选择器，如下图所示：
 
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-4.png?raw=true)
 
-![Alt text](lma-4.png)
+index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个
+
 CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速存取。CPU 一共提供了 cs、ss、ds、es、fs、gs 共 6 个段寄存器，其中 es fs gs 为通用寄存器。
 
 1. cs：存放代码段选择器
 2. ss：存放程序的栈段选择器
 3. ds：存放数据段选择器
 
-一个段选择器的属性由一个 8 Byte 长度的段描述符表示，段描述符要么存储在 **全局描述符表(GDT)** 中，要么存储在 **局部描述符表(LDT)** 中。一般只存在 GDT，如果一个程序需要 GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GDT 和 LDT 的地址和长度分别存储在 gdtr 和 ldtr 寄存器中。
+一个段选择器的属性由一个 8 Byte 长度的段描述符表示，段描述符要么存储在 **全局描述符表(GDT)** 中，要么存储在 **局部描述符表(LDT)** 中。一般只存在 GDT，如果一个程序需要 GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GDT 和 LDT 的地址和长度存储在 gdtr 和 ldtr 控制寄存器中。一个典型的段描述符如下图所示：
+
+![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-3.png?raw=true)
+
+在段选择器中有一个 RPL，在段描述符中有一个 DPL，还有一个 CPL。一般情况下 CPL = RPL，处理器在访问内存的时候，会比较 CPL 和 DPL，看权限是否符合要求，如果不符合要求就禁止访问，具体的规则在这里先忽略。
+
+在 Linux 中广泛使用到数据段描述符（DSD）和代码段描述符（CSD），这两个可以存储在 GDT 或者 LDT 中。而任务状态段描述符（TSSD）只能存在于 GDT 中，这个段用来保存处理器寄存器的内容。LDTD（LDT 描述符）也只能存储在 GDT 中。
