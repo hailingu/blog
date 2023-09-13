@@ -1,6 +1,7 @@
 ---
 title: Linux Memory Addressing
 date: 2023-09-11 20:19:16
+mathjax: true
 tags:
   - linux
   - memory
@@ -42,10 +43,27 @@ CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速�
 2. ss：存放程序的栈段选择器
 3. ds：存放数据段选择器
 
-一个段选择器的属性由一个 8 Byte 长度的段描述符表示，段描述符要么存储在 **全局描述符表(GDT)** 中，要么存储在 **局部描述符表(LDT)** 中。一般只存在 GDT，如果一个程序需要 GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GDT 和 LDT 的地址和长度存储在 gdtr 和 ldtr 控制寄存器中。一个典型的段描述符如下图所示：
+一个段选择器的属性由一个 8 Byte 长度的段描述符表示，段描述符要么存储在 **全局描述符表(GDT)** 中，要么存储在 **局部描述符表(LDT)** 中。一般只存在 GDT，如果一个程序需要 GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GDT 和 LDT 的地址和长度存储在 gdtr 和 ldtr 控制寄存器中。
+
+例如，gdtr 里存储的地址为 0x00001000，即 GDT 在内存里的地址是 0x00001000。同时，段选择符的 index 部分的值为 0x3e8（10 进制结果为 1000），那么段描述符在内存里的地址即为
+
+$$
+\begin{aligned}
+0x000003e8 \times 0x00000008 = 0x00001f40 \newline
+0x00001000 + 0x00001f40 = 0x00002f40
+\end{aligned}
+$$
+
+到目前为止，当拿到一个逻辑地址的时候，会通过下图所示的过程找到内存里的段描述符
+
+![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-5.png?raw=true)
+
+一个典型的段描述符如下图所示：
 
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-3.png?raw=true)
 
 在段选择器中有一个 RPL，在段描述符中有一个 DPL，还有一个 CPL。一般情况下 CPL = RPL，处理器在访问内存的时候，会比较 CPL 和 DPL，看权限是否符合要求，如果不符合要求就禁止访问，具体的规则在这里先忽略。
 
 在 Linux 中广泛使用到数据段描述符（DSD）和代码段描述符（CSD），这两个可以存储在 GDT 或者 LDT 中。而任务状态段描述符（TSSD）只能存在于 GDT 中，这个段用来保存处理器寄存器的内容。LDTD（LDT 描述符）也只能存储在 GDT 中。
+
+为了加速段描述符的读取，CPU 提供了 6 个不可编程的寄存器，用于存储段选择器对应的 8 Byte 段描述符。在每次段选择器加载到前述提到的段寄存器的时候，对应的段描述符也会加载到对应的不可编程寄存器中。

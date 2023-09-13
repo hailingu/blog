@@ -28,7 +28,7 @@
 <meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 在 x86 中需要区分 3 种地址：">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-09-11T12:19:16.000Z">
-<meta property="article:modified_time" content="2023-09-12T18:26:07.180Z">
+<meta property="article:modified_time" content="2023-09-13T09:37:07.731Z">
 <meta property="article:author" content="Hailin">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="memory">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-13 02:26:07" itemprop="dateModified" datetime="2023-09-13T02:26:07+08:00">2023-09-13</time>
+                <time title="Modified: 2023-09-13 17:37:07" itemprop="dateModified" datetime="2023-09-13T17:37:07+08:00">2023-09-13</time>
               </span>
 
           
@@ -244,8 +244,20 @@ src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-4.png
 <strong>全局描述符表(GDT)</strong> 中，要么存储在
 <strong>局部描述符表(LDT)</strong> 中。一般只存在 GDT，如果一个程序需要
 GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GDT 和 LDT
-的地址和长度存储在 gdtr 和 ldtr
-控制寄存器中。一个典型的段描述符如下图所示：</p>
+的地址和长度存储在 gdtr 和 ldtr 控制寄存器中。</p>
+<p>例如，gdtr 里存储的地址为 0x00001000，即 GDT 在内存里的地址是
+0x00001000。同时，段选择符的 index 部分的值为 0x3e8（10 进制结果为
+1000），那么段描述符在内存里的地址即为</p>
+<p><span class="math display">\[
+\begin{aligned}
+0x000003e8 \times 0x00000008 = 0x00001f40 \newline
+0x00001000 + 0x00001f40 = 0x00002f40
+\end{aligned}
+\]</span></p>
+<p>到目前为止，当拿到一个逻辑地址的时候，会通过下图所示的过程找到内存里的段描述符</p>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-5.png?raw=true" /></p>
+<p>一个典型的段描述符如下图所示：</p>
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-3.png?raw=true" /></p>
 <p>在段选择器中有一个 RPL，在段描述符中有一个 DPL，还有一个
@@ -256,6 +268,9 @@ DPL，看权限是否符合要求，如果不符合要求就禁止访问，具�
 GDT 或者 LDT 中。而任务状态段描述符（TSSD）只能存在于 GDT
 中，这个段用来保存处理器寄存器的内容。LDTD（LDT 描述符）也只能存储在 GDT
 中。</p>
+<p>为了加速段描述符的读取，CPU 提供了 6
+个不可编程的寄存器，用于存储段选择器对应的 8 Byte
+段描述符。在每次段选择器加载到前述提到的段寄存器的时候，对应的段描述符也会加载到对应的不可编程寄存器中。</p>
 
     </div>
 
@@ -508,6 +523,59 @@ window.addEventListener('pjax:success', () => {
   
 
   
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 
