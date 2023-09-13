@@ -28,7 +28,7 @@
 <meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 在 x86 中需要区分 3 种地址：">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-09-11T12:19:16.000Z">
-<meta property="article:modified_time" content="2023-09-13T09:37:07.731Z">
+<meta property="article:modified_time" content="2023-09-13T09:53:45.153Z">
 <meta property="article:author" content="Hailin">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="memory">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-13 17:37:07" itemprop="dateModified" datetime="2023-09-13T17:37:07+08:00">2023-09-13</time>
+                <time title="Modified: 2023-09-13 17:53:45" itemprop="dateModified" datetime="2023-09-13T17:53:45+08:00">2023-09-13</time>
               </span>
 
           
@@ -257,6 +257,7 @@ GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GD
 <p>到目前为止，当拿到一个逻辑地址的时候，会通过下图所示的过程找到内存里的段描述符</p>
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-5.png?raw=true" /></p>
+<p>可以发现这个流程还是挺长的。</p>
 <p>一个典型的段描述符如下图所示：</p>
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-3.png?raw=true" /></p>
@@ -270,7 +271,9 @@ GDT 或者 LDT 中。而任务状态段描述符（TSSD）只能存在于 GDT
 中。</p>
 <p>为了加速段描述符的读取，CPU 提供了 6
 个不可编程的寄存器，用于存储段选择器对应的 8 Byte
-段描述符。在每次段选择器加载到前述提到的段寄存器的时候，对应的段描述符也会加载到对应的不可编程寄存器中。</p>
+段描述符。在每次段选择器加载到前述提到的段寄存器的时候，对应的段描述符也会加载到对应的不可编程寄存器中，这样访问内存里段地址的流程被大大简化了，如下所示。</p>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-6.png?raw=true" /></p>
 
     </div>
 
