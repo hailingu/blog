@@ -54,7 +54,7 @@ $$
 \end{aligned}
 $$
 
-到目前为止，当拿到一个逻辑地址的时候，会通过下图所示的过程找到内存里的段描述符
+到目前为止，当拿到一个逻辑地址的时候，会通过下图所示的过程得到线性地址
 
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-5.png?raw=true)
 
