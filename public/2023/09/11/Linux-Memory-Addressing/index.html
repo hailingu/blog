@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"hailingu.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 在 x86 中需要区分 3 种地址：">
+  <meta name="description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux Memory Addressing">
 <meta property="og:url" content="http://hailingu.com/2023/09/11/Linux-Memory-Addressing/index.html">
 <meta property="og:site_name" content="Blog">
-<meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 在 x86 中需要区分 3 种地址：">
+<meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-09-11T12:19:16.000Z">
-<meta property="article:modified_time" content="2023-09-13T10:19:54.099Z">
+<meta property="article:modified_time" content="2023-09-18T02:22:45.338Z">
 <meta property="article:author" content="Hailin">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="memory">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-13 18:19:54" itemprop="dateModified" datetime="2023-09-13T18:19:54+08:00">2023-09-13</time>
+                <time title="Modified: 2023-09-18 10:22:45" itemprop="dateModified" datetime="2023-09-18T10:22:45+08:00">2023-09-18</time>
               </span>
 
           
@@ -203,6 +203,7 @@ file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶
 文件加载到内存里，并设置其运行的地址空间为对应的<strong>逻辑地址空间</strong>。CPU
 运行加载在内存中的程序，读取指令，生成 <strong>逻辑地址</strong>
 （或者叫做虚拟地址）。</p>
+<h2 id="段选择器和段寄存器">段选择器和段寄存器</h2>
 <p>在 x86 中需要区分 3 种地址：</p>
 <ul>
 <li>逻辑地址：一个逻辑地址的内容表示一个操作数或者指令，逻辑地址本身由<strong>段选择符</strong>和<strong>段内偏移量</strong>组成。比如下图的指令
@@ -221,7 +222,6 @@ Unit</strong> 处理得到 <strong>物理地址</strong> 。CPU 拿到
 <strong>物理地址</strong>
 后，往内存地址总线上发送内存访问单元的物理地址信号，并由内存仲裁器决定，CPU
 是否能立刻访问对应的内存地址。</p>
-<h2 id="段选择器和段寄存器">段选择器和段寄存器</h2>
 <p>一个逻辑地址由段标识符和偏移量组成</p>
 <ol type="1">
 <li>段标识符：长度为 16bit，又被称为段选择器</li>
@@ -230,7 +230,7 @@ Unit</strong> 处理得到 <strong>物理地址</strong> 。CPU 拿到
 <p>段选择器，如下图所示：</p>
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-4.png?raw=true" /></p>
-<p>index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个</p>
+<p>Index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个</p>
 <p>CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速存取。CPU
 一共提供了 cs、ss、ds、es、fs、gs 共 6 个段寄存器，其中 es fs gs
 为通用寄存器。</p>
@@ -248,12 +248,10 @@ GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GD
 <p>例如，gdtr 里存储的地址为 0x00001000，即 GDT 在内存里的地址是
 0x00001000。同时，段选择符的 index 部分的值为 0x3e8（10 进制结果为
 1000），那么段描述符在内存里的地址即为</p>
-<p><span class="math display">\[
-\begin{aligned}
-0x000003e8 \times 0x00000008 = 0x00001f40 \newline
-0x00001000 + 0x00001f40 = 0x00002f40
-\end{aligned}
-\]</span></p>
+<p>0x000003e8 <span class="math inline">\(\times\)</span> 0x00000008 =
+0x00001f40</p>
+<p>0x00001000 <span class="math inline">\(+\)</span> 0x00001f40 =
+0x00002f40</p>
 <p>到目前为止，当拿到一个逻辑地址的时候，会通过下图所示的过程得到线性地址</p>
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-5.png?raw=true" /></p>
@@ -264,16 +262,18 @@ src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-3.png
 <p>在段选择器中有一个 RPL，在段描述符中有一个 DPL，还有一个
 CPL。一般情况下 CPL = RPL，处理器在访问内存的时候，会比较 CPL 和
 DPL，看权限是否符合要求，如果不符合要求就禁止访问，具体的规则在这里先忽略。</p>
-<p>在 Linux
-中广泛使用到数据段描述符（DSD）和代码段描述符（CSD），这两个可以存储在
-GDT 或者 LDT 中。而任务状态段描述符（TSSD）只能存在于 GDT
+<p>在 Linux 中广泛使用到数据段描述符（Data Segment
+Descriptor）和代码段描述符（Code Segment Descriptor），这两个可以存储在
+GDT 或者 LDT 中。而任务状态段描述符（Task Status Segment
+Descriptor）只能存在于 GDT
 中，这个段用来保存处理器寄存器的内容。LDTD（LDT 描述符）也只能存储在 GDT
 中。</p>
 <p>为了加速段描述符的读取，CPU 提供了 6
 个不可编程的寄存器，用于存储段选择器对应的 8 Byte
-段描述符。在每次段选择器加载到前述提到的段寄存器的时候，对应的段描述符也会加载到对应的不可编程寄存器中，这样获得线性地址流程被大大简化了，如下所示。</p>
+段描述符。在每次段选择寄存器加载相应的段选择器的时候，段选择器所对应的段描述符也会加载到相应的不可编程寄存器中，这样获得线性地址流程被大大简化了，如下所示。</p>
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-6.png?raw=true" /></p>
+<h2 id="linux-中的段">Linux 中的段</h2>
 
     </div>
 
@@ -356,7 +356,7 @@ src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-6.png
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%B5%E9%80%89%E6%8B%A9%E5%99%A8%E5%92%8C%E6%AE%B5%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">段选择器和段寄存器</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%B5%E9%80%89%E6%8B%A9%E5%99%A8%E5%92%8C%E6%AE%B5%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">段选择器和段寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E4%B8%AD%E7%9A%84%E6%AE%B5"><span class="nav-number">2.</span> <span class="nav-text">Linux 中的段</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

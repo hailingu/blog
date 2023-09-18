@@ -176,7 +176,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-13 18:19:54" itemprop="dateModified" datetime="2023-09-13T18:19:54+08:00">2023-09-13</time>
+                <time title="Modified: 2023-09-18 10:22:45" itemprop="dateModified" datetime="2023-09-18T10:22:45+08:00">2023-09-18</time>
               </span>
 
           
@@ -196,6 +196,7 @@ file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶
 文件加载到内存里，并设置其运行的地址空间为对应的<strong>逻辑地址空间</strong>。CPU
 运行加载在内存中的程序，读取指令，生成 <strong>逻辑地址</strong>
 （或者叫做虚拟地址）。</p>
+<h2 id="段选择器和段寄存器">段选择器和段寄存器</h2>
 <p>在 x86 中需要区分 3 种地址：</p>
 <ul>
 <li>逻辑地址：一个逻辑地址的内容表示一个操作数或者指令，逻辑地址本身由<strong>段选择符</strong>和<strong>段内偏移量</strong>组成。比如下图的指令
