@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hailingu.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux Memory Addressing">
+<meta property="og:url" content="http://hailingu.com/2023/09/11/Linux-Memory-Addressing/index.html">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-09-11T12:19:16.000Z">
+<meta property="article:modified_time" content="2023-09-18T02:22:45.338Z">
+<meta property="article:author" content="Hailin">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="memory">
+<meta property="article:tag" content="addressing">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://hailingu.com/2023/09/11/Linux-Memory-Addressing/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Linux Memory Addressing | Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://hailingu.com/2023/09/11/Linux-Memory-Addressing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Hailin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux Memory Addressing
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-09-11 20:19:16" itemprop="dateCreated datePublished" datetime="2023-09-11T20:19:16+08:00">2023-09-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-18 10:22:45" itemprop="dateModified" datetime="2023-09-18T10:22:45+08:00">2023-09-18</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在 Linux 中，程序经过编译后会生成 object
+file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load
+阶段会通过系统调用创建<strong>逻辑地址空间</strong>，读取 link 后的 elf
+文件加载到内存里，并设置其运行的地址空间为对应的<strong>逻辑地址空间</strong>。CPU
+运行加载在内存中的程序，读取指令，生成 <strong>逻辑地址</strong>
+（或者叫做虚拟地址）。</p>
+<h2 id="段选择器和段寄存器">段选择器和段寄存器</h2>
+<p>在 x86 中需要区分 3 种地址：</p>
+<ul>
+<li>逻辑地址：一个逻辑地址的内容表示一个操作数或者指令，逻辑地址本身由<strong>段选择符</strong>和<strong>段内偏移量</strong>组成。比如下图的指令
+4，表示为 [CS:EIP]，即 CS 表示段选择符，EIP 表示段内偏移量</li>
+<li>线性地址：32bit 无符号数表达的连续地址</li>
+<li>物理地址：CPU 往内存地址上发送的信号所表达的内存单元地址</li>
+</ul>
+<p>它们的关系如图所示：</p>
+<span id="more"></span>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-1.png?raw=true" /></p>
+<p>程序里的逻辑地址，经过<strong>Memory Management Unit(MMU)</strong>
+的硬件电路 <strong>Segmentation Unit</strong> 的处理，得到
+<strong>线性地址</strong>。<strong>线性地址</strong> 由 <strong>Paging
+Unit</strong> 处理得到 <strong>物理地址</strong> 。CPU 拿到
+<strong>物理地址</strong>
+后，往内存地址总线上发送内存访问单元的物理地址信号，并由内存仲裁器决定，CPU
+是否能立刻访问对应的内存地址。</p>
+<p>一个逻辑地址由段标识符和偏移量组成</p>
+<ol type="1">
+<li>段标识符：长度为 16bit，又被称为段选择器</li>
+<li>偏移量：长度为 32bit</li>
+</ol>
+<p>段选择器，如下图所示：</p>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-4.png?raw=true" /></p>
+<p>Index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个</p>
+<p>CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速存取。CPU
+一共提供了 cs、ss、ds、es、fs、gs 共 6 个段寄存器，其中 es fs gs
+为通用寄存器。</p>
+<ol type="1">
+<li>cs：存放代码段选择器</li>
+<li>ss：存放程序的栈段选择器</li>
+<li>ds：存放数据段选择器</li>
+</ol>
+<p>一个段选择器的属性由一个 8 Byte
+长度的段描述符表示，段描述符要么存储在
+<strong>全局描述符表(GDT)</strong> 中，要么存储在
+<strong>局部描述符表(LDT)</strong> 中。一般只存在 GDT，如果一个程序需要
+GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GDT 和 LDT
+的地址和长度存储在 gdtr 和 ldtr 控制寄存器中。</p>
+<p>例如，gdtr 里存储的地址为 0x00001000，即 GDT 在内存里的地址是
+0x00001000。同时，段选择符的 index 部分的值为 0x3e8（10 进制结果为
+1000），那么段描述符在内存里的地址即为</p>
+<p>0x000003e8 <span class="math inline">\(\times\)</span> 0x00000008 =
+0x00001f40</p>
+<p>0x00001000 <span class="math inline">\(+\)</span> 0x00001f40 =
+0x00002f40</p>
+<p>到目前为止，当拿到一个逻辑地址的时候，会通过下图所示的过程得到线性地址</p>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-5.png?raw=true" /></p>
+<p>可以发现这个流程还是挺长的。</p>
+<p>一个典型的段描述符如下图所示：</p>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-3.png?raw=true" /></p>
+<p>在段选择器中有一个 RPL，在段描述符中有一个 DPL，还有一个
+CPL。一般情况下 CPL = RPL，处理器在访问内存的时候，会比较 CPL 和
+DPL，看权限是否符合要求，如果不符合要求就禁止访问，具体的规则在这里先忽略。</p>
+<p>在 Linux 中广泛使用到数据段描述符（Data Segment
+Descriptor）和代码段描述符（Code Segment Descriptor），这两个可以存储在
+GDT 或者 LDT 中。而任务状态段描述符（Task Status Segment
+Descriptor）只能存在于 GDT
+中，这个段用来保存处理器寄存器的内容。LDTD（LDT 描述符）也只能存储在 GDT
+中。</p>
+<p>为了加速段描述符的读取，CPU 提供了 6
+个不可编程的寄存器，用于存储段选择器对应的 8 Byte
+段描述符。在每次段选择寄存器加载相应的段选择器的时候，段选择器所对应的段描述符也会加载到相应的不可编程寄存器中，这样获得线性地址流程被大大简化了，如下所示。</p>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-6.png?raw=true" /></p>
+<h2 id="linux-中的段">Linux 中的段</h2>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/memory/" rel="tag"># memory</a>
+              <a href="/tags/addressing/" rel="tag"># addressing</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/03/15/Computational-Advertising-2-Introduction-to-Online-Advertising/" rel="prev" title="Computational Advertising 2 Introduction to Online Advertising">
+      <i class="fa fa-chevron-left"></i> Computational Advertising 2 Introduction to Online Advertising
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%B5%E9%80%89%E6%8B%A9%E5%99%A8%E5%92%8C%E6%AE%B5%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">段选择器和段寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E4%B8%AD%E7%9A%84%E6%AE%B5"><span class="nav-number">2.</span> <span class="nav-text">Linux 中的段</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hailin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hailin</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+    </div>
+</body>
+</html>

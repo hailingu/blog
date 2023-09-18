@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hailingu.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什么是在线广告 伴随着智能手机的普及，在线广告已经在我们的生活中无处不在了。当然，如果你仍然使用的是功能机的话，那么在线广告可能对你的影响不会那么大。当我们打开手机的上的应用，第一个画面往往就是一个在线广告。例如我刚刚打开了我的腾讯视频 APP，第一个画面是下面这个样子，显然是一个携程的广告：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Computational Advertising 2 Introduction to Online Advertising">
+<meta property="og:url" content="http://hailingu.com/2023/03/15/Computational-Advertising-2-Introduction-to-Online-Advertising/index.html">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="什么是在线广告 伴随着智能手机的普及，在线广告已经在我们的生活中无处不在了。当然，如果你仍然使用的是功能机的话，那么在线广告可能对你的影响不会那么大。当我们打开手机的上的应用，第一个画面往往就是一个在线广告。例如我刚刚打开了我的腾讯视频 APP，第一个画面是下面这个样子，显然是一个携程的广告：">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-03-15T15:30:00.000Z">
+<meta property="article:modified_time" content="2023-03-22T03:30:55.555Z">
+<meta property="article:author" content="Hailin">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="advertising">
+<meta property="article:tag" content="software engineering">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://hailingu.com/2023/03/15/Computational-Advertising-2-Introduction-to-Online-Advertising/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Computational Advertising 2 Introduction to Online Advertising | Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://hailingu.com/2023/03/15/Computational-Advertising-2-Introduction-to-Online-Advertising/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Hailin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Computational Advertising 2 Introduction to Online Advertising
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-03-15 23:30:00" itemprop="dateCreated datePublished" datetime="2023-03-15T23:30:00+08:00">2023-03-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-03-22 11:30:55" itemprop="dateModified" datetime="2023-03-22T11:30:55+08:00">2023-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什么是在线广告">什么是在线广告</h2>
+<p>伴随着智能手机的普及，在线广告已经在我们的生活中无处不在了。当然，如果你仍然使用的是功能机的话，那么在线广告可能对你的影响不会那么大。当我们打开手机的上的应用，第一个画面往往就是一个在线广告。例如我刚刚打开了我的腾讯视频
+APP，第一个画面是下面这个样子，显然是一个携程的广告：</p>
+<span id="more"></span>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/raw/master/images/open-screen-advertisement.jpeg?raw=true" /></p>
+<p>而且携程广告图片上的地方我去年的时候刚刚去过，大理洱海的网红 S
+湾。一般大家把这种打开 APP
+第一个画面看到的广告叫做<em>开屏广告</em>。<strong>这种在腾讯视频这样的在线媒体上投放的广告，就称之为在线广告</strong>。</p>
+<h2 id="什么是在线媒体">什么是在线媒体</h2>
+<p>那什么是在线媒体呢？一般是以下的几种：</p>
+<ul>
+<li>短视频 APP（抖音，tiktok，快手）</li>
+<li>长视频 APP（腾讯，爱奇艺，优酷）</li>
+<li>UGC 类 APP（哔哩哔哩，小红书）</li>
+<li>资讯 APP（今日头条，腾讯新闻，网易新闻）</li>
+<li>电商（淘宝，天猫，京东，小米商城，得物）</li>
+<li>社交类 APP（微信，QQ，微博，陌陌）</li>
+<li>论坛类 APP（虎扑，贴吧）</li>
+<li>知识分享类 APP（知乎，得到）</li>
+<li>传统的门户网站（新浪，搜狐）</li>
+</ul>
+<p>暂时只想到这么多，以后想到更合适的分类时候再做修改和补充。可以发现所谓的在线媒体就是一堆能在上面打广告的互联网
+APP。</p>
+<h2 id="为什么会有在线广告">为什么会有在线广告</h2>
+<p>互联网发展这么多年来，互联网企业想挣钱有 3 种主流的方式：</p>
+<ol type="1">
+<li>卖广告</li>
+<li>卖会员</li>
+<li>道具充值（游戏道具，虚拟的皮肤）</li>
+</ol>
+<p>以及近年来兴起的第 4 种方式：</p>
+<ol start="4" type="1">
+<li>内容付费</li>
+</ol>
+<p>其中卖广告是最稳定的变现方式，因为卖会员和道具充值是直接向用户收钱，而卖广告是向广告主收钱。同时卖广告和卖会员的变现方式需要互联网企业的
+APP 有足够的吸引力让用户主动付费，这点其实是很难做到的。</p>
+<p>比如爱奇艺的会员费远远不能覆盖它的运营费用；比如以前不打广告的哔哩哔哩，现在的广告点位也越来越多了；比如
+Netflix 原来只靠会员收费就能正常运营，但是从 2 年前开始，也希望在它的
+APP 里添加广告来维持收入。</p>
+<p>如果希望通过道具充值获得盈利，那么互联网企业的 APP
+需要给出足够让用户愿意付费的理由。比如游戏行业过去几年的卖皮肤，或者卖游戏角色。如果游戏是原神这种现象级的，那么可以吸引到足够多的充值用户主动付费；如果游戏让玩家觉得不值得充钱，例如在线围棋这种，就不会让大量的玩家有付费的欲望。</p>
+<p>内容付费是近年来出现的第 4 种赚钱方式，但是这个赚钱方式有一个 APP
+得有特别值得付费的内容，而且不能太贵，比如在线教育的平台：coursera
+里面的付费课程，就价格合适。</p>
+<p>互联网上更多的 APP
+其实是卖不了会员，也没有道具可以出售给用户的，更没有什么值得付费的内容，比如新闻类
+APP，短视频类 APP。这类 APP 往往有着巨大的流量，所以这类 APP
+想变现的途径就变成了把流量卖给广告主，为广告主打广告挣钱。从广告主的角度来说，以前他们可以通过街边的布告栏，展示牌，报纸广告，电视广告去向用户推销自己的产品，但是随着移动互联网的发展，人们一天的精力从每天睁开眼睛，到闭上眼睛之前都花费在了各种
+APP 上，所以广告主还想像过去一样接触到用户，那就只能到各大 APP
+里找了。在这种情况下，APP
+和广告主各取所需，一个要钱，一个要流量来打广告。</p>
+<p>随着互联网软硬件的发展，在线广告的玩法也变得比 10
+年前越来越花样繁多，也越来越复杂。这部分后面再讲了。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/advertising/" rel="tag"># advertising</a>
+              <a href="/tags/software-engineering/" rel="tag"># software engineering</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/04/My-go-journey-1/" rel="prev" title="My go journey 1">
+      <i class="fa fa-chevron-left"></i> My go journey 1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/09/11/Linux-Memory-Addressing/" rel="next" title="Linux Memory Addressing">
+      Linux Memory Addressing <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%9C%A8%E7%BA%BF%E5%B9%BF%E5%91%8A"><span class="nav-number">1.</span> <span class="nav-text">什么是在线广告</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%9C%A8%E7%BA%BF%E5%AA%92%E4%BD%93"><span class="nav-number">2.</span> <span class="nav-text">什么是在线媒体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89%E5%9C%A8%E7%BA%BF%E5%B9%BF%E5%91%8A"><span class="nav-number">3.</span> <span class="nav-text">为什么会有在线广告</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hailin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hailin</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+    </div>
+</body>
+</html>
