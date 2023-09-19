@@ -35,7 +35,14 @@ tags:
 
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-4.png?raw=true)
 
-Index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个
+Index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个，在实际的 Linux 的 linux/include/asm-i386/segment.h 中，全局 GDT 里存放的段描述符数量为 32 个。
+
+```c
+/*
+ * The GDT has 32 entries
+ */
+#define GDT_ENTRIES 32
+```
 
 CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速存取。CPU 一共提供了 CS、SS、DS、ES、FS、GS 共 6 个段寄存器，其中 ES FS GS 为通用寄存器。
 
@@ -76,19 +83,20 @@ CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速�
 1. 方便把 Linux 系统移植到不同的架构中，如 aarch64， RISC V。
 2. 内存管理更加简单，不同的进程使用同样的段寄存器
 
-Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS 和 \_\_USER_DS，它们定义了内核代码选择器、内核数据段选择器，用户代码段选择器，用户数据段选择器，可以在 linux/arch/x86/include/asm/segment.h 中找到相关的定义
+Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS 和 \_\_USER_DS，它们定义了内核代码选择器、内核数据段选择器，用户代码段选择器，用户数据段选择器，可以在 linux/include/asm-i386/segment.h 中找到相关的定义
 
 ```c
-#define GDT_ENTRY_KERNEL_CS		12
-#define GDT_ENTRY_KERNEL_DS		13
 #define GDT_ENTRY_DEFAULT_USER_CS	14
+#define __USER_CS (GDT_ENTRY_DEFAULT_USER_CS * 8 + 3)
+
 #define GDT_ENTRY_DEFAULT_USER_DS	15
+#define __USER_DS (GDT_ENTRY_DEFAULT_USER_DS * 8 + 3)
 
+#define GDT_ENTRY_KERNEL_CS		(GDT_ENTRY_KERNEL_BASE + 0)
+#define __KERNEL_CS (GDT_ENTRY_KERNEL_CS * 8)
 
-#define __KERNEL_CS			(GDT_ENTRY_KERNEL_CS*8)
-#define __KERNEL_DS			(GDT_ENTRY_KERNEL_DS*8)
-#define __USER_DS			(GDT_ENTRY_DEFAULT_USER_DS*8 + 3)
-#define __USER_CS			(GDT_ENTRY_DEFAULT_USER_CS*8 + 3)
+#define GDT_ENTRY_KERNEL_DS		(GDT_ENTRY_KERNEL_BASE + 1)
+#define __KERNEL_DS (GDT_ENTRY_KERNEL_DS * 8)
 ```
 
 结合前面提到的 16 位段选择器，其中低 3 位是设置 DPL 和 段是在 LDT 还是 GDT 中，那么 GDT_ENTRY_DEFAULT_USER_DS\*8 等价于将 14 << 3，即 14 左移 3 位，恰好填入了 16 位选择器的 index 的部分。而 +3 则恰好设置了段选择器的 RPL 为 3，如图所示
@@ -104,4 +112,10 @@ Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS �
 | kernel code | 0x00000000 | 1   | 0xfffff | 1   | 10   | 0   | 1   | 1   |
 | kernel data | 0x00000000 | 1   | 0xfffff | 1   | 2    | 0   | 1   | 1   |
 
-这里段描述符的 G 为 1，说明段的计数粒度为 4096B = $2^{12}$B， Limit 的最大偏移量是 0xfffff = $2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 = 2^{20}$，所以每个段的线性地址空间是 $2^{12} \cdot 2^{20} = 2^{32} = 4$GB
+这里段描述符的 G 为 1，说明段的计数粒度为 4096B = $2^{12}$ B， Limit 的最大偏移量是 0xfffff = $2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 = 2^{20}$，所以每个段的线性地址空间是 $2^{12} \cdot 2^{20} = 2^{32} = 4$ GB。
+
+在 Linux 中，如果遇到用户模式和内核模式切换，那么不需要考虑保存段选择器，只需要保存逻辑地址中的偏移量就好了。例如在用户模式切换到内核模式的时候，Linux 会保证 CS，DS，SS 中的段选择器从用户段选择器切换为内核段选择器。
+
+## Linux 中的 GDT
+
+Linux 会为每一个 CPU 创建单独的 GDT。多核 CPU 系统就有多个 GDT 表，而单核系统则只有一个 GDT 表。在 Linux 启动的时候，会加载 GDT 表进入 gdtr 寄存器中，
