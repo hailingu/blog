@@ -91,6 +91,17 @@ Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS �
 #define __USER_CS			(GDT_ENTRY_DEFAULT_USER_CS*8 + 3)
 ```
 
-结合前面提到的 16 位段选择器，其中低 3 位是设置 RPL 和 段是在 LDT 还是 GDT 中，那么 GDT_ENTRY_DEFAULT_USER_DS\*8 等价于将 14 << 3，即 14 左移 3 位，恰好填入了 16 位选择器的 index 的部分。而 +3 则恰好设置了段选择器的 RPL 为 3，如图所示
+结合前面提到的 16 位段选择器，其中低 3 位是设置 DPL 和 段是在 LDT 还是 GDT 中，那么 GDT_ENTRY_DEFAULT_USER_DS\*8 等价于将 14 << 3，即 14 左移 3 位，恰好填入了 16 位选择器的 index 的部分。而 +3 则恰好设置了段选择器的 RPL 为 3，如图所示
 
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-7.png?raw=true)
+
+这些段选择器对应的段描述符在 Linux 设置如下表，可以将各个字段对应回前面的段描述符的图中。
+
+| 段描述符    | Base       | G   | Limit   | S   | Type | DPL | D/B | P   |
+| ----------- | ---------- | --- | ------- | --- | ---- | --- | --- | --- |
+| user code   | 0x00000000 | 1   | 0xfffff | 1   | 10   | 3   | 1   | 1   |
+| user data   | 0x00000000 | 1   | 0xfffff | 1   | 2    | 3   | 1   | 1   |
+| kernel code | 0x00000000 | 1   | 0xfffff | 1   | 10   | 0   | 1   | 1   |
+| kernel data | 0x00000000 | 1   | 0xfffff | 1   | 2    | 0   | 1   | 1   |
+
+这里段描述符的 G 为 1，说明段的计数粒度为 4096B = $2^{12}$B， Limit 的最大偏移量是 0xfffff = $2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 = 2^{20}$，所以每个段的线性地址空间是 $2^{12} \cdot 2^{20} = 2^{32} = 4$GB
