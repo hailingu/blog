@@ -28,7 +28,7 @@
 <meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-09-11T12:19:16.000Z">
-<meta property="article:modified_time" content="2023-09-18T02:22:45.338Z">
+<meta property="article:modified_time" content="2023-09-19T10:00:12.639Z">
 <meta property="article:author" content="Hailin">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="memory">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-18 10:22:45" itemprop="dateModified" datetime="2023-09-18T10:22:45+08:00">2023-09-18</time>
+                <time title="Modified: 2023-09-19 18:00:12" itemprop="dateModified" datetime="2023-09-19T18:00:12+08:00">2023-09-19</time>
               </span>
 
           
@@ -232,12 +232,12 @@ Unit</strong> 处理得到 <strong>物理地址</strong> 。CPU 拿到
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-4.png?raw=true" /></p>
 <p>Index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个</p>
 <p>CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速存取。CPU
-一共提供了 cs、ss、ds、es、fs、gs 共 6 个段寄存器，其中 es fs gs
+一共提供了 CS、SS、DS、ES、FS、GS 共 6 个段寄存器，其中 ES FS GS
 为通用寄存器。</p>
 <ol type="1">
-<li>cs：存放代码段选择器</li>
-<li>ss：存放程序的栈段选择器</li>
-<li>ds：存放数据段选择器</li>
+<li>CS：存放代码段选择器</li>
+<li>SS：存放程序的栈段选择器</li>
+<li>DS：存放数据段选择器</li>
 </ol>
 <p>一个段选择器的属性由一个 8 Byte
 长度的段描述符表示，段描述符要么存储在
@@ -274,6 +274,20 @@ Descriptor）只能存在于 GDT
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-6.png?raw=true" /></p>
 <h2 id="linux-中的段">Linux 中的段</h2>
+<p>在 Linux 逻辑地址中的段选择器 CS DS 对应的 Code Segment Descriptor 和
+Data Segment Descriptor 中的起始地址总是
+0x00000000，即直接使用线性地址，这样做的优势在于：</p>
+<ol type="1">
+<li>方便把 Linux 系统移植到不同的架构中，如 aarch64， RISC V。</li>
+<li>内存管理更加简单，不同的进程使用同样的段寄存器</li>
+</ol>
+<p>Linux 定义了 4 个宏，分别是 __KERNEL_CS, __KERNEL_DS, __USER_CS 和
+__USER_DS，它们定义了内核代码描述符、内核数据段描述符，用户代码段描述符，用户数据段描述符在
+GDT 的位置，可以在 linux/arch/x86/include/asm/segment.h
+中找到相关的定义</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> GDT_ENTRY_KERNEL_CS		12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GDT_ENTRY_KERNEL_DS		13</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GDT_ENTRY_DEFAULT_USER_CS	14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GDT_ENTRY_DEFAULT_USER_DS	15</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __KERNEL_CS			(GDT_ENTRY_KERNEL_CS*8)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __KERNEL_DS			(GDT_ENTRY_KERNEL_DS*8)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __USER_DS			(GDT_ENTRY_DEFAULT_USER_DS*8 + 3)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __USER_CS			(GDT_ENTRY_DEFAULT_USER_CS*8 + 3)</span></span><br></pre></td></tr></table></figure>
+<p>上面 (GDT_ENTRY_DEFAULT_USER_CS*8 + 3) 的这个 +3
+是为了设置前面提到过的</p>
 
     </div>
 
