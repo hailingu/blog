@@ -76,7 +76,7 @@ CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速�
 1. 方便把 Linux 系统移植到不同的架构中，如 aarch64， RISC V。
 2. 内存管理更加简单，不同的进程使用同样的段寄存器
 
-Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS 和 \_\_USER_DS，它们定义了内核代码描述符、内核数据段描述符，用户代码段描述符，用户数据段描述符在 GDT 的位置，可以在 linux/arch/x86/include/asm/segment.h 中找到相关的定义
+Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS 和 \_\_USER_DS，它们定义了内核代码选择器、内核数据段选择器，用户代码段选择器，用户数据段选择器，可以在 linux/arch/x86/include/asm/segment.h 中找到相关的定义
 
 ```c
 #define GDT_ENTRY_KERNEL_CS		12
@@ -91,4 +91,6 @@ Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS �
 #define __USER_CS			(GDT_ENTRY_DEFAULT_USER_CS*8 + 3)
 ```
 
-上面 (GDT_ENTRY_DEFAULT_USER_CS\*8 + 3) 的这个 +3 是为了设置前面提到过的
+结合前面提到的 16 位段选择器，其中低 3 位是设置 RPL 和 段是在 LDT 还是 GDT 中，那么 GDT_ENTRY_DEFAULT_USER_DS\*8 等价于将 14 << 3，即 14 左移 3 位，恰好填入了 16 位选择器的 index 的部分。而 +3 则恰好设置了段选择器的 RPL 为 3，如图所示
+
+![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-7.png?raw=true)
