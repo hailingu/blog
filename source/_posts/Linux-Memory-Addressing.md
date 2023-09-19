@@ -37,11 +37,11 @@ tags:
 
 Index 的部分长度为 13 bit，表示系统最可支持的最大分段数为 8192 个
 
-CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速存取。CPU 一共提供了 cs、ss、ds、es、fs、gs 共 6 个段寄存器，其中 es fs gs 为通用寄存器。
+CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速存取。CPU 一共提供了 CS、SS、DS、ES、FS、GS 共 6 个段寄存器，其中 ES FS GS 为通用寄存器。
 
-1. cs：存放代码段选择器
-2. ss：存放程序的栈段选择器
-3. ds：存放数据段选择器
+1. CS：存放代码段选择器
+2. SS：存放程序的栈段选择器
+3. DS：存放数据段选择器
 
 一个段选择器的属性由一个 8 Byte 长度的段描述符表示，段描述符要么存储在 **全局描述符表(GDT)** 中，要么存储在 **局部描述符表(LDT)** 中。一般只存在 GDT，如果一个程序需要 GDT 之外的额外的段，那么程序可以将这些段存储在 LDT 中。GDT 和 LDT 的地址和长度存储在 gdtr 和 ldtr 控制寄存器中。
 
@@ -70,3 +70,25 @@ CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速�
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-6.png?raw=true)
 
 ## Linux 中的段
+
+在 Linux 逻辑地址中的段选择器 CS DS 对应的 Code Segment Descriptor 和 Data Segment Descriptor 中的起始地址总是 0x00000000，即直接使用线性地址，这样做的优势在于：
+
+1. 方便把 Linux 系统移植到不同的架构中，如 aarch64， RISC V。
+2. 内存管理更加简单，不同的进程使用同样的段寄存器
+
+Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS 和 \_\_USER_DS，它们定义了内核代码描述符、内核数据段描述符，用户代码段描述符，用户数据段描述符在 GDT 的位置，可以在 linux/arch/x86/include/asm/segment.h 中找到相关的定义
+
+```c
+#define GDT_ENTRY_KERNEL_CS		12
+#define GDT_ENTRY_KERNEL_DS		13
+#define GDT_ENTRY_DEFAULT_USER_CS	14
+#define GDT_ENTRY_DEFAULT_USER_DS	15
+
+
+#define __KERNEL_CS			(GDT_ENTRY_KERNEL_CS*8)
+#define __KERNEL_DS			(GDT_ENTRY_KERNEL_DS*8)
+#define __USER_DS			(GDT_ENTRY_DEFAULT_USER_DS*8 + 3)
+#define __USER_CS			(GDT_ENTRY_DEFAULT_USER_CS*8 + 3)
+```
+
+上面 (GDT_ENTRY_DEFAULT_USER_CS\*8 + 3) 的这个 +3 是为了设置前面提到过的
