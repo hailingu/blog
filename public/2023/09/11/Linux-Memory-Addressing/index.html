@@ -28,7 +28,7 @@
 <meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-09-11T12:19:16.000Z">
-<meta property="article:modified_time" content="2023-09-20T01:32:37.838Z">
+<meta property="article:modified_time" content="2023-09-22T09:07:11.348Z">
 <meta property="article:author" content="Hailin">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="memory">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-20 09:32:37" itemprop="dateModified" datetime="2023-09-20T09:32:37+08:00">2023-09-20</time>
+                <time title="Modified: 2023-09-22 17:07:11" itemprop="dateModified" datetime="2023-09-22T17:07:11+08:00">2023-09-22</time>
               </span>
 
           
@@ -369,9 +369,9 @@ src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-7.png
 </tbody>
 </table>
 <p>这里段描述符的 G 为 1，说明段的计数粒度为 4096B = <span
-class="math inline">\(2^{12}\)</span> B， Limit 的最大偏移量是 0xfffff =
-<span class="math inline">\(2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4
-= 2^{20}\)</span>，所以每个段的线性地址空间是 <span
+class="math inline">\(2^{12}\)</span> B = 4 KB， Limit 的最大偏移量是
+0xfffff = <span class="math inline">\(2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4
+\cdot 2^4 = 2^{20}\)</span>，所以每个段的线性地址空间是 <span
 class="math inline">\(2^{12} \cdot 2^{20} = 2^{32} = 4\)</span> GB。</p>
 <p>在 Linux
 中，如果遇到用户模式和内核模式切换，那么不需要考虑保存段选择器，只需要保存逻辑地址中的偏移量就好了。例如在用户模式切换到内核模式的时候，Linux
@@ -379,7 +379,39 @@ class="math inline">\(2^{12} \cdot 2^{20} = 2^{32} = 4\)</span> GB。</p>
 <h2 id="linux-中的-gdt">Linux 中的 GDT</h2>
 <p>Linux 会为每一个 CPU 创建单独的 GDT。多核 CPU 系统就有多个 GDT
 表，而单核系统则只有一个 GDT 表。在 Linux 启动的时候，会加载 GDT 表进入
-gdtr 寄存器中，</p>
+gdtr 寄存器中。前面提到过，Linux GDT 表的长度为 32，其中有 14
+个段描述符是保留和未使用的，剩下的 18 个段描述符：</p>
+<ol type="1">
+<li>1 个 Task Status Segment Descriptor(TSSD)，每个处理器的 TSSD 指向的
+TSS 是不同的。所有的 TSS 都存储在 init_tss 数组中，第 n 个 cpu 对应的
+GDT 的 TSSD 的 Base 指向的是 init_tss 中的第 n 项。TSSD 的 Limit 的成
+0xeb，</li>
+</ol>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-8.png?raw=true" /></p>
+<ol start="2" type="1">
+<li>1 个 LDT Descriptor ，被所有进程共享</li>
+<li>3 个 Thread Local Storage Descriptor，用于存储 Thread Local
+的数据</li>
+<li>5 个 Plug and Play BIOS Descriptor，用于即插即用设备</li>
+<li>1 个特殊的 TSS 段描述符，用于处理 “Double Fault”</li>
+<li>1 个内核代码段描述符</li>
+<li>1 个内核数据段描述符</li>
+<li>1 个用户代码段描述符</li>
+<li>1 个用户数据段描述符</li>
+<li>3 个 Advanced Power Management 段描述符</li>
+</ol>
+<p>LDT 在 Linux 不常被使用。有一个应用 LDT 的例子是 Wine。LDT
+的内存存储在 default_ldt 数组中。</p>
+<h2 id="分页">分页</h2>
+<p>要区分两个概念，<strong>pages</strong> 和 <strong>page
+frames</strong>。一个 <strong>线性地址</strong> 的一段连续地址区间称为
+<strong>pages</strong> 。一个 <strong>物理内存</strong>
+的一段固定长度连续存储单元，称为 <strong>page frames</strong>。通常
+pages 和 page frames 的大小是相同的，所以一个 page
+的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame
+映射的数据结构叫做 <strong>page table</strong>。<strong>page
+table</strong> 在内存里的地址存储在 cr3 寄存器中，</p>
 
     </div>
 
@@ -462,7 +494,7 @@ gdtr 寄存器中，</p>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%B5%E9%80%89%E6%8B%A9%E5%99%A8%E5%92%8C%E6%AE%B5%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">段选择器和段寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E4%B8%AD%E7%9A%84%E6%AE%B5"><span class="nav-number">2.</span> <span class="nav-text">Linux 中的段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E4%B8%AD%E7%9A%84-gdt"><span class="nav-number">3.</span> <span class="nav-text">Linux 中的 GDT</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%B5%E9%80%89%E6%8B%A9%E5%99%A8%E5%92%8C%E6%AE%B5%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">段选择器和段寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E4%B8%AD%E7%9A%84%E6%AE%B5"><span class="nav-number">2.</span> <span class="nav-text">Linux 中的段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E4%B8%AD%E7%9A%84-gdt"><span class="nav-number">3.</span> <span class="nav-text">Linux 中的 GDT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E9%A1%B5"><span class="nav-number">4.</span> <span class="nav-text">分页</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -138,4 +138,4 @@ LDT 在 Linux 不常被使用。有一个应用 LDT 的例子是 Wine。LDT 的�
 
 ## 分页
 
-要区分两个概念，**pages** 和 **page frames**。一个 **线性地址** 的一段连续地址区间称为 **pages** 。一个 **物理内存** 的一段固定长度连续存储单元，称为 **page frames**。通常 pages 和 page frames 的大小是相同的，所以一个 page 的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame 映射的数据结构叫做 **page table**。**page table** 在内存里的地址存储在 cr3 寄存器中，
+要区分两个概念，**pages** 和 **page frames**。一个 **线性地址** 的一段连续地址区间称为 **pages** 。一个 **物理内存** 的一段固定长度连续存储单元，称为 **page frames**。通常 pages 和 page frames 的大小是相同的，所以一个 page 的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame 映射的数据结构叫做 **page table**。**page table** 在内存里的地址存储在 cr3 寄存器中。
