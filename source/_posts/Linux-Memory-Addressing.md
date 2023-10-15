@@ -138,7 +138,7 @@ LDT 在 Linux 不常被使用。有一个应用 LDT 的例子是 Wine。LDT 的�
 
 ## 分页
 
-要区分两个概念，**pages** 和 **page frames**。一个 **线性地址** 的一段连续地址区间称为 **pages** 。一个 **物理内存** 的一段固定长度连续存储单元，称为 **page frames**。通常 pages 和 page frames 的大小是相同的，所以一个 page 的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame 映射的数据结构叫做 **page table**。当前进程正在使用的 **page table** 在内存里的地址存储在 cr3 寄存器中，cr3 寄存器的长度是 32 位，其中低 12 位一定是 0。
+要区分两个概念，**pages** 和 **page frames**。**线性地址** 的一段固定长度的连续地址区间称为 **pages** 。**物理内存** 的一段固定长度连续存储单元，称为 **page frames**。通常 pages 和 page frames 的大小是相同的，所以一个 page 的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame 映射的数据结构叫做 **page table**。当前进程正在使用的 **page table** 在内存里的地址存储在 cr3 寄存器中，cr3 寄存器的长度是 32 位，其中低 12 位一定是 0。从 80386 开始 page 的大小为 **4KB**。
 
 从 8088 处理器开始 32 位的线性地址被分成了 3 个部分，
 
@@ -150,4 +150,8 @@ LDT 在 Linux 不常被使用。有一个应用 LDT 的例子是 Wine。LDT 的�
 - page table
 - offset
 
-cr3 寄存器存储的是 page directory 的基础地址。例如一个 32 位的线性地址 0x18fe34ab, cr3 寄存器里存放的基础地址为 0x23aef000
+cr3 寄存器存储的是 page directory 的基础地址。例如一个 32 位的线性地址 0x18fe34ab, cr3 寄存器里存放的基础地址为 0x23aef000，线性地址转化为物理内存地址如下所示
+
+![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-10.png?raw=true)
+
+如果只有一级 page table，那么需要存储 $2^{20}$ 个 4B 长度的地址，需要占用 4MB 的内存空间。page directory 条目和 page table 条目的结构完全一致，每个条目占据 4B 大小，其中 20bit 指向下一级条目的基础地址，12bit 存放本级条目的 flag。
