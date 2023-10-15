@@ -28,7 +28,7 @@
 <meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-09-11T12:19:16.000Z">
-<meta property="article:modified_time" content="2023-09-26T18:32:42.666Z">
+<meta property="article:modified_time" content="2023-10-15T15:58:44.165Z">
 <meta property="article:author" content="Hailin">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="memory">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-27 02:32:42" itemprop="dateModified" datetime="2023-09-27T02:32:42+08:00">2023-09-27</time>
+                <time title="Modified: 2023-10-15 23:58:44" itemprop="dateModified" datetime="2023-10-15T23:58:44+08:00">2023-10-15</time>
               </span>
 
           
@@ -408,14 +408,15 @@ src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-8.png
 的内存存储在 default_ldt 数组中。</p>
 <h2 id="分页">分页</h2>
 <p>要区分两个概念，<strong>pages</strong> 和 <strong>page
-frames</strong>。一个 <strong>线性地址</strong> 的一段连续地址区间称为
-<strong>pages</strong> 。一个 <strong>物理内存</strong>
-的一段固定长度连续存储单元，称为 <strong>page frames</strong>。通常
-pages 和 page frames 的大小是相同的，所以一个 page
-的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame
-映射的数据结构叫做 <strong>page table</strong>。当前进程正在使用的
-<strong>page table</strong> 在内存里的地址存储在 cr3 寄存器中，cr3
-寄存器的长度是 32 位，其中低 12 位一定是 0。</p>
+frames</strong>。<strong>线性地址</strong>
+的一段固定长度的连续地址区间称为 <strong>pages</strong>
+。<strong>物理内存</strong> 的一段固定长度连续存储单元，称为
+<strong>page frames</strong>。通常 pages 和 page frames
+的大小是相同的，所以一个 page 的数据可以恰好装进一个 page frame
+里。内存里存储这种 page 和 page frame 映射的数据结构叫做 <strong>page
+table</strong>。当前进程正在使用的 <strong>page table</strong>
+在内存里的地址存储在 cr3 寄存器中，cr3 寄存器的长度是 32 位，其中低 12
+位一定是 0。从 80386 开始 page 的大小为 <strong>4KB</strong>。</p>
 <p>从 8088 处理器开始 32 位的线性地址被分成了 3 个部分，</p>
 <p><img
 src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-9.png?raw=true" /></p>
@@ -426,7 +427,15 @@ src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-9.png
 <li>offset</li>
 </ul>
 <p>cr3 寄存器存储的是 page directory 的基础地址。例如一个 32
-位的线性地址 0x18fe34ab, cr3 寄存器里存放的基础地址为 0x23aef000</p>
+位的线性地址 0x18fe34ab, cr3 寄存器里存放的基础地址为
+0x23aef000，线性地址转化为物理内存地址如下所示</p>
+<p><img
+src="https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-10.png?raw=true" /></p>
+<p>如果只有一级 page table，那么需要存储 <span
+class="math inline">\(2^{20}\)</span> 个 4B 长度的地址，需要占用 4MB
+的内存空间。page directory 条目和 page table
+条目的结构完全一致，每个条目占据 4B 大小，其中 20bit
+指向下一级条目的基础地址，12bit 存放本级条目的 flag。</p>
 
     </div>
 
