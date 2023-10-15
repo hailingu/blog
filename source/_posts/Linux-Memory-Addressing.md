@@ -112,7 +112,7 @@ Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS �
 | kernel code | 0x00000000 | 1   | 0xfffff | 1   | 10   | 0   | 1   | 1   |
 | kernel data | 0x00000000 | 1   | 0xfffff | 1   | 2    | 0   | 1   | 1   |
 
-这里段描述符的 G 为 1，说明段的计数粒度为 4096B = $2^{12}$ B = 4 KB， Limit 的最大偏移量是 0xfffff = $2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 = 2^{20}$，所以每个段的线性地址空间是 $2^{12} \cdot 2^{20} = 2^{32} = 4$ GB。
+这里段描述符的 G 为 1，说明段的计数粒度为 4096B = $2^{12}$ B = 4 KB， Limit 的最大偏移量是 0xfffff = $2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 \cdot 2^4 = 2^{20}$，所以每个段的线性地址空间是 $2^{12} \cdot 2^{20} = 2^{32} = 4$ GB。另外一点，在 8086 CPU 有 20 根地址总线和 16 根数据总线，意味着可以 8086 CPU 可以寻址的空间是 1M = $ 2^{10} \times 2^{10} $ 大小的地址，一次可以处理的数据量是 16 bit。
 
 在 Linux 中，如果遇到用户模式和内核模式切换，那么不需要考虑保存段选择器，只需要保存逻辑地址中的偏移量就好了。例如在用户模式切换到内核模式的时候，Linux 会保证 CS，DS，SS 中的段选择器从用户段选择器切换为内核段选择器。
 
@@ -120,7 +120,7 @@ Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS �
 
 Linux 会为每一个 CPU 创建单独的 GDT。多核 CPU 系统就有多个 GDT 表，而单核系统则只有一个 GDT 表。在 Linux 启动的时候，会加载 GDT 表进入 gdtr 寄存器中。前面提到过，Linux GDT 表的长度为 32，其中有 14 个段描述符是保留和未使用的，剩下的 18 个段描述符：
 
-1. 1 个 Task Status Segment Descriptor(TSSD)，每个处理器的 TSSD 指向的 TSS 是不同的。所有的 TSS 都存储在 init_tss 数组中，第 n 个 cpu 对应的 GDT 的 TSSD 的 Base 指向的是 init_tss 中的第 n 项。TSSD 的 Limit 的成 0xeb，
+1. 1 个 Task Status Segment Descriptor(TSSD)，每个处理器的 TSSD 指向的 TSS 是不同的。所有的 TSS 都存储在 init_tss 数组中，第 n 个 cpu 对应的 GDT 的 TSSD 的 Base 指向的是 init_tss 中的第 n 项。TSSD 的 Limit 的总是 0xeb。
 
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-8.png?raw=true)
 
@@ -138,4 +138,16 @@ LDT 在 Linux 不常被使用。有一个应用 LDT 的例子是 Wine。LDT 的�
 
 ## 分页
 
-要区分两个概念，**pages** 和 **page frames**。一个 **线性地址** 的一段连续地址区间称为 **pages** 。一个 **物理内存** 的一段固定长度连续存储单元，称为 **page frames**。通常 pages 和 page frames 的大小是相同的，所以一个 page 的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame 映射的数据结构叫做 **page table**。**page table** 在内存里的地址存储在 cr3 寄存器中。
+要区分两个概念，**pages** 和 **page frames**。一个 **线性地址** 的一段连续地址区间称为 **pages** 。一个 **物理内存** 的一段固定长度连续存储单元，称为 **page frames**。通常 pages 和 page frames 的大小是相同的，所以一个 page 的数据可以恰好装进一个 page frame 里。内存里存储这种 page 和 page frame 映射的数据结构叫做 **page table**。当前进程正在使用的 **page table** 在内存里的地址存储在 cr3 寄存器中，cr3 寄存器的长度是 32 位，其中低 12 位一定是 0。
+
+从 8088 处理器开始 32 位的线性地址被分成了 3 个部分，
+
+![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-9.png?raw=true)
+
+分别是
+
+- page directory
+- page table
+- offset
+
+cr3 寄存器存储的是 page directory 的基础地址。例如一个 32 位的线性地址 0x18fe34ab, cr3 寄存器里存放的基础地址为 0x23aef000
