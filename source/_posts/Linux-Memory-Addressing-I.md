@@ -86,16 +86,16 @@ CPU 通过提供段寄存器存储段选择器，实现了段选择器的快速�
 Linux 定义了 4 个宏，分别是 \_\_KERNEL_CS, \_\_KERNEL_DS, \_\_USER_CS 和 \_\_USER_DS，它们定义了内核代码选择器、内核数据段选择器，用户代码段选择器，用户数据段选择器，可以在 linux/include/asm-i386/segment.h 中找到相关的定义
 
 ```c
-#define GDT_ENTRY_DEFAULT_USER_CS	14
+#define GDT_ENTRY_DEFAULT_USER_CS 14
 #define __USER_CS (GDT_ENTRY_DEFAULT_USER_CS * 8 + 3)
 
-#define GDT_ENTRY_DEFAULT_USER_DS	15
+#define GDT_ENTRY_DEFAULT_USER_DS 15
 #define __USER_DS (GDT_ENTRY_DEFAULT_USER_DS * 8 + 3)
 
-#define GDT_ENTRY_KERNEL_CS		(GDT_ENTRY_KERNEL_BASE + 0)
+#define GDT_ENTRY_KERNEL_CS  (GDT_ENTRY_KERNEL_BASE + 0)
 #define __KERNEL_CS (GDT_ENTRY_KERNEL_CS * 8)
 
-#define GDT_ENTRY_KERNEL_DS		(GDT_ENTRY_KERNEL_BASE + 1)
+#define GDT_ENTRY_KERNEL_DS  (GDT_ENTRY_KERNEL_BASE + 1)
 #define __KERNEL_DS (GDT_ENTRY_KERNEL_DS * 8)
 ```
 
@@ -168,3 +168,26 @@ page directory 条目和 page table 条目的结构完全一致，每个条目�
 - Page Size flag：设置 2MB-4MB 大 page，设置后会少一级页表
 
 ![](https://github.com/hailingu/hailingu.github.io/blob/master/images/lma-11.png?raw=true)
+
+### PAE
+
+8086 有 20 根地址线可寻址 1MB 地址空间；80386 到 Pentium 有 32 根地址线可寻址 4GB 的地址空间。从 Pentium Pro 开始的 cpu 都有 36 根地址线，支持 64GB 的寻址。但要实现 32 位系统支持 64GB 的地址空间，需要通过 Intel 新引入的 PAE 技术。
+
+在 64GB 的系统中，page frame 的个数变成了 $2^{24}$ 个，每个 page frame 的大小和之前的一样都是 4KB。因为 page frame 数量的改变，一个 page directory 所需要的 bit 数变成了 24bit 存放下一级的物理地址 + 12bit 的属性，一共 36bit，使用 8B 存储。这就导致了在 page table 大小不变的情况下，page table 的条目数从 1024 变成了 512。
+
+同时新增了一级 PDPT 目录，该目录包含 4 个 8B 大小的条目。PDPT 存放在以 32B 对齐的整数被开始位置上，cr3 寄存器存储 PDPT 的基础地址，在 32 位系统上需要 27bit 存储地址。在 PAE 模式下，线性地址映射变成了
+
+1. cr3 存储 PDPT 的地址
+2. 31-30 位选择 4 个 PDPT 的一个
+3. 29-21 位选择 512 个 page directory 中的一个
+4. 20-12 位选择 512 个 page table 中的一个
+5. 11-0 位选择 4KB 大小的 page frame 里偏移量
+
+如果使用 2MB 的大页，那么线性地址映射变成
+
+1. cr3 存储 PDPT 的地址
+2. 31-30 位选择 4 个 PDPT 的一个
+3. 29-21 位选择 512 个 page table 中的一个
+4. 20-0 选择 2MB 大小的 page frame 里的偏移量
+
+32 位系统使用 64GB 的内存，对普通程序来说，还是 4GB 的地址空间，只是内核程序员可以将 4GB 的地址空间映射到物理 64GB 内存上。这么干的一个好处就是 64GB 的内存可以跑更多的 32 位进程了。
