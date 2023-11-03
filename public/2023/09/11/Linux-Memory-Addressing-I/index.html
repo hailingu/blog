@@ -23,7 +23,7 @@
   <meta name="description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux Memory Addressing - I">
-<meta property="og:url" content="http://hailingu.com/2023/09/11/Linux-Memory-Addressing/index.html">
+<meta property="og:url" content="http://hailingu.com/2023/09/11/Linux-Memory-Addressing-I/index.html">
 <meta property="og:site_name" content="Blog">
 <meta property="og:description" content="在 Linux 中，程序经过编译后会生成 object file,这个文件是没办法直接运行的，还需要经过 link 和 load 阶段。在 load 阶段会通过系统调用创建逻辑地址空间，读取 link 后的 elf 文件加载到内存里，并设置其运行的地址空间为对应的逻辑地址空间。CPU 运行加载在内存中的程序，读取指令，生成 逻辑地址 （或者叫做虚拟地址）。 段选择器和段寄存器 在 x86 中需要区">
 <meta property="og:locale" content="en_US">
@@ -35,7 +35,7 @@
 <meta property="article:tag" content="addressing">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://hailingu.com/2023/09/11/Linux-Memory-Addressing/">
+<link rel="canonical" href="http://hailingu.com/2023/09/11/Linux-Memory-Addressing-I/">
 
 
 <script id="page-configurations">
@@ -153,7 +153,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://hailingu.com/2023/09/11/Linux-Memory-Addressing/">
+    <link itemprop="mainEntityOfPage" href="http://hailingu.com/2023/09/11/Linux-Memory-Addressing-I/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
